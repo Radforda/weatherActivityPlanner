@@ -2,7 +2,7 @@
 // all units should be in F mph 
 
 //variables
-
+console.log("I am working......sort of")
 var walk={
     name: "Walking",
     tempMax:80,
@@ -49,7 +49,7 @@ var day2={
 //We need link to radio buttons to populate this array
 var selectedActivityArray=[walk, sail];
 
-var dayArray=[day1, day2, day3, day4, day5];
+var dayArray=[day1, day2];
 
 
 
