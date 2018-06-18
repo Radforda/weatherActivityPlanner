@@ -2,6 +2,7 @@
 // all units should be in F mph 
 
 //variables
+
 var walk={
     name: "Walking",
     tempMax:80,
@@ -44,11 +45,20 @@ var day2={
     precip:'none'
 };
 
-var dayArray=[day1, day2];
-//We need link to radio buttons and this array this is just a test array
+
+//We need link to radio buttons to populate this array
 var selectedActivityArray=[walk, sail];
 
-//will be linked to submit button
+var dayArray=[day1, day2, day3, day4, day5];
+
+
+
+
+
+
+//functions
+
+//this will be called inside the api call or to run after the call is complete and the days have been assigned value
 checkWeather();
 
 //loops through the activies array and day array and runs isItAGoodDay function to compare them.
@@ -66,7 +76,7 @@ function checkWeather(){
     };
 };
 
-//compare activity properties to day properties to determine if the activity is recomended for that day.
+//compare activity properties to day properties to determine if the activity is recomended for that day the console.log it.
 //requires two objects as perameters
 function isItAGoodDay (activity, day){
     console.log( "checking if "+day.name+" is a good day for "+activity.name+".");
