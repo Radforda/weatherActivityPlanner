@@ -10,65 +10,112 @@
 <body>
     <div id="main" class="container">
         <div class="row">
-            <div class="card">
-                <h5 class="card-header">Please Enter Location Information</h5>
-                <div class="input-group">
-                    <div class="card-body">
-                        <form>
-                            <div class="form-row">
-                                <div class="col">
-                                    <label for="input-zip">Zip Code; OR</label>
-                                    <input type="text" class="form-control" id="input-zip" placeholder="10010">
-                                </div>
-                            </div>  
-                            <div class="form-row">
-                                <div class="col">
-                                    <label for="input-city">City and</label>
-                                    <input type="text" class="form-control" id="input-city" placeholder="New York">
-                                </div>
-                                <div class="col">
-                                    <label for="input-state">State</label>
-                                    <input type="text" class="form-control" id="input-state" placeholder="NY">
-                                </div>
+            <div class="card col-md-12">
+                    <form class="form-group">
+                        <h4 class="card-header col-md-12">
+                            Please Select Your Activity Details
+                        </h4>
+                        <div class="form-row">
+                            <p></p>
+                            <h5>
+                                Location Zip Code
+                            </h5>
+                        </div><div class="form-row">
+                            <!-- testing vue zip lookup found here https://vuejsfeed.com/blog/vue-js-zip-code-finder -->
+                            <div id="zip-app" class="col-md-5">    
+                                <input id="input-zip" type="text" class="form-control"  v-model="zip" maxlength="5" placeholder="ex: 94301" />
+                                <div class="error">{{error}}</div>
+                                <div class="display">{{cityString}}</div>
                             </div>
-                        </form> 
-                    </div>
+                        </div>
+                        <hr> <!-- line divider -->
+                        <div class="form-row">
+                            <h5>
+                                Desired Activities
+                            </h5>
+                            <div id="activities" class="form-check form-check-inline col-md-12">
+                                <input class="form-check-input" type="checkbox" id="act-cycling" v-model="checkedAct" value="Cycling">
+                                <label class="form-check-label mr-3" for="act-cycling">Cycling</label>
+                                <input class="form-check-input" type="checkbox" id="act-running" v-model="checkedAct" value="Running">
+                                <label class="form-check-label mr-3" for="act-running">Running</label>
+                                <input class="form-check-input" type="checkbox" id="act-golfing" v-model="checkedAct" value="Golfing">
+                                <label class="form-check-label mr-3" for="act-golfing">Golfing</label>
+                                <br>
+                                <span>Checked Activities: {{ checkedAct }}</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-12 text-center">
+                                <p></p>
+                                <button id="submit-search" class="btn btn-primary" type="submit">Submit</button>
+                            </div>
+                        </div>
+                    </form> 
                 </div>
             </div>
         </div>
-        <div class="row"><p></p></div> 
-        <div class="row">
-            <div class="card">
-                <h5 class="card-header">Please Select Your Prefered Activities</h5>
-                <div class="card-body">
-                    <div class="input-group">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="Cycling" value="option1">
-                            <label class="form-check-label" for="Cycling">Cycling</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="Running" value="option2">
-                            <label class="form-check-label" for="Running">Running</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="Golfing" value="option3">
-                            <label class="form-check-label" for="Golfing">Golfing</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-text"> </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <p></p>
-                <button id="submit-search" class="btn btn-primary" type="submit">Submit</button>
-            </div>
-        </div> 
         <div class="row">
             <div id="weather-results" class="col-md-12"></div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        let zipApp = new Vue({
+            el: "#zip-app",
+            data: {
+                city: " ",
+                state: " ",
+                cityString: " ",
+                zip: "94301",
+                error: ""
+            },
+            methods: {
+                getCity: function() {
+                    let self = this;
+                    $.getJSON("https://ZiptasticAPI.com/" + this.zip, function(result) {
+                        if (result.error) {
+                        self.error = "zip code not found";
+                        self.city = "";
+                        $(".error").addClass("no");
+                        } else {
+                        self.city = result.city;
+                        self.state = result.state;
+                        self.cityString = " City: " + result.city + " State: " + result.state;
+                        }
+                    });
+                }
+            },
+            watch: {
+                zip: function() {
+                    if (this.zip.length === 5) {
+                        this.getCity();
+                        this.error = "";
+                        $(".error").removeClass("no");
+                    }
+                    if (this.zip.length < 5) {
+                        this.city = "";
+                        this.error = "hey, that's not a zipcode";
+                    }
+                }
+            }, 
+            mounted: function(){
+                this.getCity();
+            }
+        })
+        
+        var activity = new Vue({
+            el: "#activities",
+            data: {
+                checkedAct: []
+            }
+        })
+        $("#submit-search").on("click",function(e){
+            e.preventDefault();
+            console.log(activity._data.checkedAct[0]);
+            console.log(zipApp._data.city)
+        })
+    </script>
 </body>
 </html>
