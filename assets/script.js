@@ -1,3 +1,4 @@
+
 //temporary variables
 var zipCode ="23235";
 var countryCode="US";
@@ -21,8 +22,10 @@ function getForecast(){
     });
 }
 
-function 
+
 getForecast();
+
+
 
 // all units should be in F mph 
 
