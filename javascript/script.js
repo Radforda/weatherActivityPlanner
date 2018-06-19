@@ -11,8 +11,7 @@ function getForecast(){
         method: "GET"
       }).then(function (response) {
         console.log(response);
-        // YOUR CODE GOES HERE!!!
-        forecastDays = response.data;
+        // Pass response object to 
     
         for (var i = 0; i < results.length; i++) {
 
@@ -20,5 +19,4 @@ function getForecast(){
     });
 }
 
-function 
 getForecast();
