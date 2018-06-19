@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Weather Activity Planner</title>
-    
-    <!--<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
--->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     </head>
 <body>
     <div id="main" class="container">
@@ -63,66 +61,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script>
-        let zipApp = new Vue({
-            el: "#zip-app",
-            data: {
-                city: " ",
-                state: " ",
-                cityString: " ",
-                zip: "94301",
-                error: ""
-            },
-            methods: {
-                getCity: function() {
-                    let self = this;
-                    $.getJSON("https://ZiptasticAPI.com/" + this.zip, function(result) {
-                        if (result.error) {
-                        self.error = "zip code not found";
-                        self.city = "";
-                        $(".error").addClass("no");
-                        } else {
-                        self.city = result.city;
-                        self.state = result.state;
-                        self.cityString = " City: " + result.city + " State: " + result.state;
-                        }
-                    });
-                }
-            },
-            watch: {
-                zip: function() {
-                    if (this.zip.length === 5) {
-                        this.getCity();
-                        this.error = "";
-                        $(".error").removeClass("no");
-                    }
-                    if (this.zip.length < 5) {
-                        this.city = "";
-                        this.error = "hey, that's not a zipcode";
-                    }
-                }
-            }, 
-            mounted: function(){
-                this.getCity();
-            }
-        })
-        
-        var activity = new Vue({
-            el: "#activities",
-            data: {
-                checkedAct: []
-            }
-        })
-        $("#submit-search").on("click",function(e){
-            e.preventDefault();
-            console.log(activity._data.checkedAct[0]);
-            console.log(zipApp._data.city)
-        })
-    </script>
-    <!--
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-
--->
-<script src="assets/script.js"></script>
+    <script src="assets/script.js"></script>
 </body>
 </html>

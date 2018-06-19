@@ -3,8 +3,8 @@
 
 //variables
 console.log("I am working......sort of")
-var walk={
-    name: "Walking",
+var Running={
+    name: "Running",
     tempMax:80,
     tempMin:55,
     windMin:0,
@@ -13,8 +13,18 @@ var walk={
     precip:['none']
 };
 
-var sail={
-    name:"Sailing",
+var Cycling={
+    name:"Cycling",
+    tempMax:110,
+    tempMin:60,
+    windMin:10,
+    windMax:20,
+    skyCondition:['clear', 'cloudy'],//will need updated depending on the API
+    precip:['none', 'lightRain']
+};
+
+var Golfing={
+    name:"Golfing",
     tempMax:110,
     tempMin:60,
     windMin:10,
@@ -47,19 +57,16 @@ var day2={
 
 
 //We need link to radio buttons to populate this array
-var selectedActivityArray=[walk, sail];
-
+var listedActivties = [Cycling,Running,Golfing]
+var selectedActivityArray=[];
 var dayArray=[day1, day2];
-
-
-
 
 
 
 //functions
 
 //this will be called inside the api call or to run after the call is complete and the days have been assigned value
-checkWeather();
+
 
 //loops through the activies array and day array and runs isItAGoodDay function to compare them.
 function checkWeather(){
@@ -69,9 +76,9 @@ function checkWeather(){
     for (var i=0; i<selectedActivityArray.length; i++){
         console.log("i: "+i);
         for(var j=0; j<dayArray.length;j++){
+            var activityObject = window[selectedActivityArray[i]];
             console.log("j: "+j);
-            
-            isItAGoodDay(selectedActivityArray[i], dayArray[j]);
+            isItAGoodDay(activityObject, dayArray[j]);
         };
     };
 };
@@ -94,3 +101,70 @@ function isItAGoodDay (activity, day){
     }else{console.log(activity.name+' is not recommended due to the tempurature')};  
 
 };
+
+
+
+
+///Daniel Code
+
+let zipApp = new Vue({
+    el: "#zip-app",
+    data: {
+        city: " ",
+        state: " ",
+        cityString: " ",
+        zip: "94301",
+        error: ""
+    },
+    methods: {
+        getCity: function() {
+            let self = this;
+            $.getJSON("https://ZiptasticAPI.com/" + this.zip, function(result) {
+                if (result.error) {
+                self.error = "zip code not found";
+                self.city = "";
+                $(".error").addClass("no");
+                } else {
+                self.city = result.city;
+                self.state = result.state;
+                self.cityString = " City: " + result.city + " State: " + result.state;
+                }
+            });
+        }
+    },
+    watch: {
+        zip: function() {
+            if (this.zip.length === 5) {
+                this.getCity();
+                this.error = "";
+                $(".error").removeClass("no");
+            }
+            if (this.zip.length < 5) {
+                this.city = "";
+                this.error = "hey, that's not a zipcode";
+            }
+        }
+    }, 
+    mounted: function(){
+        this.getCity();
+    }
+})
+
+var activities = new Vue({
+    el: "#activities",
+    data: {
+        checkedAct: []
+    }
+})
+$("#submit-search").on("click",function(e){
+    e.preventDefault();
+        $("#submit-search").on("click",function(e){
+            e.preventDefault();
+            console.log(activities);
+            console.log(activities._data.checkedAct[0]);
+            console.log(zipApp._data.city);
+            selectedActivityArray = activities._data.checkedAct;
+            console.log(selectedActivityArray);
+            checkWeather();
+        })
+})
