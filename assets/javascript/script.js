@@ -1,10 +1,38 @@
 
+//temporary variables
+var zipCode ="23235";
+var countryCode="US";
+var forecastDays;
+
+
+//Api call to get array of 
+function getForecast(){
+    var queryURL = "https://api.openweathermap.org/data/2.5/forecast?zip=" + zipCode +","+ countryCode+"&appid=0300e0494f9976a54d845a8f39ccb339";
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).then(function (response) {
+        console.log(response);
+        // YOUR CODE GOES HERE!!!
+        forecastDays = response.data;
+    
+        for (var i = 0; i < results.length; i++) {
+
+        }
+    });
+}
+
+
+getForecast();
+
+
+
 // all units should be in F mph 
 
 //variables
 console.log("I am working......sort of")
-var walk={
-    name: "Walking",
+var Running={
+    name: "Running",
     tempMax:80,
     tempMin:55,
     windMin:0,
@@ -13,8 +41,18 @@ var walk={
     precip:['none']
 };
 
-var sail={
-    name:"Sailing",
+var Cycling={
+    name:"Cycling",
+    tempMax:110,
+    tempMin:60,
+    windMin:10,
+    windMax:20,
+    skyCondition:['clear', 'cloudy'],//will need updated depending on the API
+    precip:['none', 'lightRain']
+};
+
+var Golfing={
+    name:"Golfing",
     tempMax:110,
     tempMin:60,
     windMin:10,
@@ -47,19 +85,16 @@ var day2={
 
 
 //We need link to radio buttons to populate this array
-var selectedActivityArray=[walk, sail];
-
+var listedActivties = [Cycling,Running,Golfing]
+var selectedActivityArray=[];
 var dayArray=[day1, day2];
-
-
-
 
 
 
 //functions
 
 //this will be called inside the api call or to run after the call is complete and the days have been assigned value
-checkWeather();
+
 
 //loops through the activies array and day array and runs isItAGoodDay function to compare them.
 function checkWeather(){
@@ -69,9 +104,9 @@ function checkWeather(){
     for (var i=0; i<selectedActivityArray.length; i++){
         console.log("i: "+i);
         for(var j=0; j<dayArray.length;j++){
+            var activityObject = window[selectedActivityArray[i]];
             console.log("j: "+j);
-            
-            isItAGoodDay(selectedActivityArray[i], dayArray[j]);
+            isItAGoodDay(activityObject, dayArray[j]);
         };
     };
 };
