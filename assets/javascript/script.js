@@ -160,6 +160,7 @@ function isItAGoodDay(activity, day) {
 
 
 
+
 ///Daniel Code
 
 let zipApp = new Vue({
