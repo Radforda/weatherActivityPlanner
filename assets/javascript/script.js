@@ -94,3 +94,41 @@ function isItAGoodDay (activity, day){
     }else{console.log(activity.name+' is not recommended due to the tempurature')};  
 
 };
+
+
+//firebase config
+var config = {
+    apiKey: "AIzaSyAnIrJKU0DegRK-R7CqlNd84wrrdqmg7Xg",
+    authDomain: "practice-a6d1d.firebaseapp.com",
+    databaseURL: "https://practice-a6d1d.firebaseio.com",
+    projectId: "practice-a6d1d",
+    storageBucket: "practice-a6d1d.appspot.com",
+    messagingSenderId: "487061189656"
+  };
+  firebase.initializeApp(config);
+
+
+  var provider = new firebase.auth.GoogleAuthProvider();
+  
+
+  //Google Sign in
+ $("#signIn").on("click", function(){
+console.log("sign in clicked")
+  firebase.auth().signInWithPopup(provider).then(function(result) {
+  // This gives you a Google Access Token. You can use it to access the Google API.
+  var token = result.credential.accessToken;
+  // The signed-in user info.
+  var user = result.user;
+  console.log(user);
+  // ...
+}).catch(function(error) {
+  // Handle Errors here.
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  // The email of the user's account used.
+  var email = error.email;
+  // The firebase.auth.AuthCredential type that was used.
+  var credential = error.credential;
+  // ...
+});
+});
