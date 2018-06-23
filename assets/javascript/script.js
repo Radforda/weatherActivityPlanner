@@ -131,68 +131,39 @@ function isItAGoodDay (activity, day){
 };
 
 
+//firebase config
+var config = {
+    apiKey: "AIzaSyAnIrJKU0DegRK-R7CqlNd84wrrdqmg7Xg",
+    authDomain: "practice-a6d1d.firebaseapp.com",
+    databaseURL: "https://practice-a6d1d.firebaseio.com",
+    projectId: "practice-a6d1d",
+    storageBucket: "practice-a6d1d.appspot.com",
+    messagingSenderId: "487061189656"
+  };
+  firebase.initializeApp(config);
 
 
-///Daniel Code
+  var provider = new firebase.auth.GoogleAuthProvider();
+  
 
-let zipApp = new Vue({
-    el: "#zip-app",
-    data: {
-        city: " ",
-        state: " ",
-        cityString: " ",
-        zip: "94301",
-        error: ""
-    },
-    methods: {
-        getCity: function() {
-            let self = this;
-            $.getJSON("https://ZiptasticAPI.com/" + this.zip, function(result) {
-                if (result.error) {
-                self.error = "zip code not found";
-                self.city = "";
-                $(".error").addClass("no");
-                } else {
-                self.city = result.city;
-                self.state = result.state;
-                self.cityString = " City: " + result.city + " State: " + result.state;
-                }
-            });
-        }
-    },
-    watch: {
-        zip: function() {
-            if (this.zip.length === 5) {
-                this.getCity();
-                this.error = "";
-                $(".error").removeClass("no");
-            }
-            if (this.zip.length < 5) {
-                this.city = "";
-                this.error = "hey, that's not a zipcode";
-            }
-        }
-    }, 
-    mounted: function(){
-        this.getCity();
-    }
-})
-
-var activities = new Vue({
-    el: "#activities",
-    data: {
-        checkedAct: []
-    }
-})
-$("#submit-search").on("click",function(e){
-    e.preventDefault();
-        $("#submit-search").on("click",function(e){
-            e.preventDefault();
-            console.log(activities);
-            console.log(activities._data.checkedAct[0]);
-            console.log(zipApp._data.city);
-            selectedActivityArray = activities._data.checkedAct;
-            console.log(selectedActivityArray);
-            checkWeather();
-        })
-})
+  //Google Sign in
+ $("#signIn").on("click", function(){
+console.log("sign in clicked")
+  firebase.auth().signInWithPopup(provider).then(function(result) {
+  // This gives you a Google Access Token. You can use it to access the Google API.
+  var token = result.credential.accessToken;
+  // The signed-in user info.
+  var user = result.user;
+  console.log(user);
+  // ...
+}).catch(function(error) {
+  // Handle Errors here.
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  // The email of the user's account used.
+  var email = error.email;
+  // The firebase.auth.AuthCredential type that was used.
+  var credential = error.credential;
+  // ...
+});
+});
