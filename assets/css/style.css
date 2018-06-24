@@ -1,0 +1,9 @@
+.cardDay{
+    border-bottom: 1px solid black;
+    
+    margin:5px;
+}
+
+.card-body{
+    padding:0px;
+}
