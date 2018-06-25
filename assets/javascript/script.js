@@ -1,8 +1,8 @@
-
 //temporary variables
-var zipCode ="23235";
-var countryCode="US";
-var forecastDays;
+var cityName = "Richmond";
+var zipCode = "";
+var countryCode = "US";
+var forecastDays = [];
 
 //function to map API response object to application object
 function mapForecastObject(data) {
@@ -43,70 +43,67 @@ function getForecast() {
 
 
 getForecast();
-
-
-
 // all units should be in F mph 
 
 //variables
 console.log("I am working......sort of")
-var Running={
+var Running = {
     name: "Running",
-    tempMax:80,
-    tempMin:55,
-    windMin:0,
-    windMax:20,
-    skyCondition:['clear', 'cloudy'],//will need updated depending on the API
-    precip:['none']
+    tempMax: 80,
+    tempMin: 55,
+    windMin: 0,
+    windMax: 20,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+    precip: ['none']
 };
 
-var Cycling={
-    name:"Cycling",
-    tempMax:110,
-    tempMin:60,
-    windMin:10,
-    windMax:20,
-    skyCondition:['clear', 'cloudy'],//will need updated depending on the API
-    precip:['none', 'lightRain']
+var Cycling = {
+    name: "Cycling",
+    tempMax: 110,
+    tempMin: 60,
+    windMin: 10,
+    windMax: 20,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+    precip: ['none', 'lightRain']
 };
 
-var Golfing={
-    name:"Golfing",
-    tempMax:110,
-    tempMin:60,
-    windMin:10,
-    windMax:20,
-    skyCondition:['clear', 'cloudy'],//will need updated depending on the API
-    precip:['none', 'lightRain']
+var Golfing = {
+    name: "Golfing",
+    tempMax: 110,
+    tempMin: 60,
+    windMin: 10,
+    windMax: 20,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+    precip: ['none', 'lightRain']
 };
 
 //days will be populated with weather API data these are test days currently
-var day1= {
-    name:"Monday",
-    tempMax:70,
-    tempMin:65,
-    windMin:15,
-    windMax:17,
-    skyCondition:"clear",
-    precip:'none'
+var day1 = {
+    name: "Monday",
+    tempMax: 70,
+    tempMin: 65,
+    windMin: 15,
+    windMax: 17,
+    skyCondition: "clear",
+    precip: 'none'
 
 };
 
-var day2={
-    name:"tuesday",
-    tempMax:70,
-    tempMin:60,
-    windMin:10,
-    windMax:20,
-    skyCondition:'clear',
-    precip:'none'
+var day2 = {
+    name: "tuesday",
+    tempMax: 70,
+    tempMin: 60,
+    windMin: 10,
+    windMax: 20,
+    skyCondition: 'clear',
+    precip: 'none'
 };
 
 
 //We need link to radio buttons to populate this array
-var listedActivties = [Cycling,Running,Golfing]
-var selectedActivityArray=[];
-var dayArray=[day1, day2];
+var listedActivties = [Cycling, Running, Golfing]
+var selectedActivityArray = [];
+var dayArray = [day1, day2];
 
 
 
@@ -115,10 +112,20 @@ var dayArray=[day1, day2];
 //this will be called inside the api call or to run after the call is complete and the days have been assigned value
 
 
-
-
-//compare activity properties to day properties to determine if the activity is recomended for that day the console.log it.
-//requires two objects as perameters
+//loops through the activies array and day array and runs isItAGoodDay function to compare them.
+/*function checkWeather(){
+    console.log("check weather is running");
+    console.log("selected activity array length: " + selectedActivityArray.length);
+    console.log("day array length: " + forecastDays.length)
+    for (var i = 0; i < selectedActivityArray.length; i++) {
+        console.log("i: " + i);
+        for (var j = 0; j < forecastDays.length; j++) {
+            var activityObject = window[selectedActivityArray[i]];
+            console.log("j: " + j);
+            isItAGoodDay(activityObject, forecastDays[j]);
+        };
+    };
+}; */
 function checkWeather() {
     console.log("check weather is running");
     console.log("selected activity array length: " + selectedActivityArray.length);
@@ -154,6 +161,71 @@ function isItAGoodDay(activity, day) {
 
 
 
+
+
+///Daniel Code
+
+let zipApp = new Vue({
+    el: "#zip-app",
+    data: {
+        city: " ",
+        state: " ",
+        cityString: " ",
+        zip: "94301",
+        error: ""
+    },
+    methods: {
+        getCity: function () {
+            let self = this;
+            $.getJSON("https://ZiptasticAPI.com/" + this.zip, function (result) {
+                if (result.error) {
+                    self.error = "zip code not found";
+                    self.city = "";
+                    $(".error").addClass("no");
+                } else {
+                    self.city = result.city;
+                    self.state = result.state;
+                    self.cityString = " City: " + result.city + " State: " + result.state;
+                }
+            });
+        }
+    },
+    watch: {
+        zip: function () {
+            if (this.zip.length === 5) {
+                this.getCity();
+                this.error = "";
+                $(".error").removeClass("no");
+            }
+            if (this.zip.length < 5) {
+                this.city = "";
+                this.error = "hey, that's not a zipcode";
+            }
+        }
+    },
+    mounted: function () {
+        this.getCity();
+    }
+})
+
+var activities = new Vue({
+    el: "#activities",
+    data: {
+        checkedAct: []
+    }
+})
+
+$("#submit-search").on("click", function (e) {
+    e.preventDefault();
+    zipCode = $("#input-zip").val();
+    getForecast();
+    console.log(activities);
+    console.log(activities._data.checkedAct[0]);
+    console.log(zipApp._data.city);
+    selectedActivityArray = activities._data.checkedAct;
+    console.log(selectedActivityArray);
+    checkWeather();
+});
 
 //firebase config
 var config = {
