@@ -209,7 +209,8 @@ $(document).ready(function(){
 
     $("#location").focusout(function(){
         if($(this).val() == "") {$(this).val(locObj.cityState)};
-        $(this).attr('size', $(this).val().length)
+        setNavFeaturesWidth();
+        // $(this).attr('size', $(this).val().length)
     });
 
     $("#geolocate").on("click",function(event) {
@@ -237,6 +238,8 @@ $(document).ready(function(){
             $("#activities-list").show();
             $("#submit-search").text("Go");
         }
+
+        $(window).resize(function(){setNavFeaturesWidth()});
     });
     
     $("#updateAddConfirm").click(function(){
@@ -383,7 +386,8 @@ function initAutocomplete() {
     autocomplete.addListener('place_changed', function(){
             console.log("did you clear it?")
             fillFromPlace(autocomplete.getPlace());
-            $("#location").attr('size', $("#location").val().length)
+            setNavFeaturesWidth();
+            // $("#location").attr('size', $("#location").val().length)
             locObj.source = "form";
         });
 }
@@ -393,7 +397,8 @@ function fillFromLatLng(){
             console.log("fillFromLatLng: " + JSON.stringify(locObj))
             console.log(address)
             $("#location").val(address.results[0].formatted_address);
-            $("#location").attr('size', $("#location").val().length)
+            setNavFeaturesWidth();
+            // $("#location").attr('size', $("#location").val().length)
             fillFromPlace(address.results[0])
         }
     )
@@ -449,7 +454,8 @@ function establishLocation(source) {
                     console.log(loadCnt + ": " + locObj.cityState)
                     console.log(locObj)
                 $("#location").val(locObj.cityState);
-                $("#location").attr('size', $("#location").val().length)
+                setNavFeaturesWidth();
+                // $("#location").attr('size', $("#location").val().length)
             }
         );
     } else if (source === "click") {
@@ -476,3 +482,16 @@ function establishLocation(source) {
     }
 }
 
+function setNavFeaturesWidth(){
+    var locInputBox = $("#location");
+    if($(window).width() <= 800) {
+        console.log('resized-small')
+        locInputBox.attr('size',"30")
+        // locInputBox.removeClass("form-control-inline");
+        // locInputBox.addClass("form-control");
+    } else {
+        locInputBox.attr('size', "50");
+        // locInputBox.removeClass("form-control");
+        // locInputBox.addClass("form-control-inline");
+    }
+}
