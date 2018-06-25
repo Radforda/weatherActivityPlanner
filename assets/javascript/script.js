@@ -43,6 +43,7 @@ function getForecast() {
 
 
 getForecast();
+// getForecast();
 // all units should be in F mph 
 
 //variables
@@ -160,73 +161,6 @@ function isItAGoodDay(activity, day) {
 };
 
 
-
-
-
-///Daniel Code
-
-let zipApp = new Vue({
-    el: "#zip-app",
-    data: {
-        city: " ",
-        state: " ",
-        cityString: " ",
-        zip: "94301",
-        error: ""
-    },
-    methods: {
-        getCity: function () {
-            let self = this;
-            $.getJSON("https://ZiptasticAPI.com/" + this.zip, function (result) {
-                if (result.error) {
-                    self.error = "zip code not found";
-                    self.city = "";
-                    $(".error").addClass("no");
-                } else {
-                    self.city = result.city;
-                    self.state = result.state;
-                    self.cityString = " City: " + result.city + " State: " + result.state;
-                }
-            });
-        }
-    },
-    watch: {
-        zip: function () {
-            if (this.zip.length === 5) {
-                this.getCity();
-                this.error = "";
-                $(".error").removeClass("no");
-            }
-            if (this.zip.length < 5) {
-                this.city = "";
-                this.error = "hey, that's not a zipcode";
-            }
-        }
-    },
-    mounted: function () {
-        this.getCity();
-    }
-})
-
-var activities = new Vue({
-    el: "#activities",
-    data: {
-        checkedAct: []
-    }
-})
-
-$("#submit-search").on("click", function (e) {
-    e.preventDefault();
-    zipCode = $("#input-zip").val();
-    getForecast();
-    console.log(activities);
-    console.log(activities._data.checkedAct[0]);
-    console.log(zipApp._data.city);
-    selectedActivityArray = activities._data.checkedAct;
-    console.log(selectedActivityArray);
-    checkWeather();
-});
-
 //firebase config
 var config = {
     apiKey: "AIzaSyAnIrJKU0DegRK-R7CqlNd84wrrdqmg7Xg",
@@ -235,31 +169,332 @@ var config = {
     projectId: "practice-a6d1d",
     storageBucket: "practice-a6d1d.appspot.com",
     messagingSenderId: "487061189656"
-  };
-  firebase.initializeApp(config);
-
-
-  var provider = new firebase.auth.GoogleAuthProvider();
+};
+firebase.initializeApp(config);
+var provider = new firebase.auth.GoogleAuthProvider();
   
-
   //Google Sign in
  $("#signIn").on("click", function(){
-console.log("sign in clicked")
-  firebase.auth().signInWithPopup(provider).then(function(result) {
-  // This gives you a Google Access Token. You can use it to access the Google API.
-  var token = result.credential.accessToken;
-  // The signed-in user info.
-  var user = result.user;
-  console.log(user);
-  // ...
-}).catch(function(error) {
-  // Handle Errors here.
-  var errorCode = error.code;
-  var errorMessage = error.message;
-  // The email of the user's account used.
-  var email = error.email;
-  // The firebase.auth.AuthCredential type that was used.
-  var credential = error.credential;
-  // ...
+    console.log("sign in clicked")
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    var token = result.credential.accessToken;
+    // The signed-in user info.
+    var user = result.user;
+    console.log(user);
+    // ...
+    }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+    });
 });
-});
+
+
+
+$(document).ready(function(){
+    establishLocation("IP");
+    loadActivitiesStandard();
+    $("#location").focus(function(){
+        console.log("current: " + $(this).val() +" Init: " + initCityState)
+        if($(this).val() === initCityState || $(this).val() === "") {
+            $(this).val("").attr("placeholder","Enter location ...");
+            // document.getElementById("location").style.zIndex = 0;
+        } else {
+            $("#changeInput").modal();
+        }
+    });
+
+    $("#location").focusout(function(){
+        if($(this).val() == "") {$(this).val(locObj.cityState)};
+        setNavFeaturesWidth();
+        // $(this).attr('size', $(this).val().length)
+    });
+
+    $("#geolocate").on("click",function(event) {
+        event.preventDefault();
+        establishLocation("click");
+    });
+
+    $("#submit-search").on("click",function(event) {
+        event.preventDefault();
+        if($("#submit-search").text() == "Go") {
+            //ui updates to show first load or reset
+            $("#welcome-msg").hide();
+            $("#weather-results").show();
+            $("#activities-list").hide();
+            $("#submit-search").text("Reset");
+            
+            //added changes for updated structure
+            zipCode = locObj.zip
+            getForecast();
+            //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)
+            selectedActivityArray = activities;
+            checkWeather();
+        } else {
+            $("#weather-results").hide();
+            $("#activities-list").show();
+            $("#submit-search").text("Go");
+        }
+
+        $(window).resize(function(){setNavFeaturesWidth()});
+    });
+    
+    $("#updateAddConfirm").click(function(){
+        $("#location").val("").attr("placeholder","Enter location ...")
+        .focus();
+    });
+    $checkboxes = $('#activities input[type="checkbox"]');
+    $('#activities input[type="checkbox"]').change(        
+        function (){
+            var searchButton = $("#submit-search");
+            var actElArr = $checkboxes.filter(':checked')
+            $('#activitiesCnt').text(actElArr.length);
+            if(actElArr.length > 0) {
+                searchButton.removeClass("disabled");
+                activities = actElArr.map(function(){return $(this).val()}).get();
+            } else {
+                searchButton.addClass("disabled")
+                activities = [];
+            }
+        }
+    );
+})
+
+
+
+
+
+
+
+
+
+
+//Daniel Code
+var statesByAbb = {
+    "AL": "Alabama",
+    "AK": "Alaska",
+    "AS": "American Samoa",
+    "AZ": "Arizona",
+    "AR": "Arkansas",
+    "CA": "California",
+    "CO": "Colorado",
+    "CT": "Connecticut",
+    "DE": "Delaware",
+    "DC": "District Of Columbia",
+    "FM": "Federated States Of Micronesia",
+    "FL": "Florida",
+    "GA": "Georgia",
+    "GU": "Guam",
+    "HI": "Hawaii",
+    "ID": "Idaho",
+    "IL": "Illinois",
+    "IN": "Indiana",
+    "IA": "Iowa",
+    "KS": "Kansas",
+    "KY": "Kentucky",
+    "LA": "Louisiana",
+    "ME": "Maine",
+    "MH": "Marshall Islands",
+    "MD": "Maryland",
+    "MA": "Massachusetts",
+    "MI": "Michigan",
+    "MN": "Minnesota",
+    "MS": "Mississippi",
+    "MO": "Missouri",
+    "MT": "Montana",
+    "NE": "Nebraska",
+    "NV": "Nevada",
+    "NH": "New Hampshire",
+    "NJ": "New Jersey",
+    "NM": "New Mexico",
+    "NY": "New York",
+    "NC": "North Carolina",
+    "ND": "North Dakota",
+    "MP": "Northern Mariana Islands",
+    "OH": "Ohio",
+    "OK": "Oklahoma",
+    "OR": "Oregon",
+    "PW": "Palau",
+    "PA": "Pennsylvania",
+    "PR": "Puerto Rico",
+    "RI": "Rhode Island",
+    "SC": "South Carolina",
+    "SD": "South Dakota",
+    "TN": "Tennessee",
+    "TX": "Texas",
+    "UT": "Utah",
+    "VT": "Vermont",
+    "VI": "Virgin Islands",
+    "VA": "Virginia",
+    "WA": "Washington",
+    "WV": "West Virginia",
+    "WI": "Wisconsin",
+    "WY": "Wyoming"
+    };
+var activities, autocomplete, locObj, $checkboxes, initCityState
+var loadCnt = 0;
+var componentForm = {
+    street_number: 'short_name',
+    route: 'long_name',
+    locality: 'long_name',
+    administrative_area_level_1: 'short_name',
+    country: 'long_name',
+    postal_code: 'short_name'
+};
+function swap(json) {
+    var ret = {};
+    for(var key in json){ret[json[key]] = key};
+    return ret;
+}
+var stateByName = swap(statesByAbb);
+
+function loadActivitiesStandard() {
+var actForm = $("#activities");
+$("#activities-list").show();
+actForm.empty();
+for(var i = 0; i < listedActivties.length; i++) {
+    var activityNameStr = listedActivties[i].name;
+    var labelHTML = '<input ' + 'class="form-check-input activity mb-2" ' + 'type="checkbox" '+ 
+        + 'id="act-' + activityNameStr + '" ' + 'value="' + activityNameStr + '"><h6>' + activityNameStr + '</h6></input>'        
+    var newLabel = $("<label>")
+        .addClass("form-check-label mx-1")
+        .attr("for","act-" + activityNameStr)
+        .html(labelHTML);
+    actForm.append(newLabel);
+    // $("#act-" + activityNameStr).text(activityNameStr)
+}
+}
+
+function Location(lat,lng,zip,city,state,cityState,source){
+    this.lat = lat;
+    this.lng = lng;
+    this.zip = zip;
+    this.city = city;
+    this.state = state;
+    this.cityState = cityState;
+    this.source = source;
+}
+
+function initAutocomplete() {
+    autocomplete = new google.maps.places.Autocomplete(
+        /** @type {!HTMLInputElement} */(document.getElementById('location')),
+            {types: ['geocode']}
+        );
+    autocomplete.addListener('place_changed', function(){
+            console.log("did you clear it?")
+            fillFromPlace(autocomplete.getPlace());
+            setNavFeaturesWidth();
+            // $("#location").attr('size', $("#location").val().length)
+            locObj.source = "form";
+        });
+}
+function fillFromLatLng(){
+    $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + locObj.lat + "," + locObj.lng).done (
+        function(address) {
+            console.log("fillFromLatLng: " + JSON.stringify(locObj))
+            console.log(address)
+            $("#location").val(address.results[0].formatted_address);
+            setNavFeaturesWidth();
+            // $("#location").attr('size', $("#location").val().length)
+            fillFromPlace(address.results[0])
+        }
+    )
+}
+function fillFromPlace(place) {
+    var componentForm = {
+        street_number: 'short_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'short_name',
+        country: 'long_name',
+        postal_code: 'short_name'
+    };
+
+    for (var i = 0; i < place.address_components.length; i++) {
+        var cityComp = false;
+        var stateComp = false;
+        var addressType = place.address_components[i].types[0];
+        if (componentForm[addressType]) {
+            var val = place.address_components[i][componentForm[addressType]];
+            switch (addressType) {
+                case "locality":
+                    locObj.city = val;
+                    break;
+                case "administrative_area_level_1":
+                    locObj.state = val;
+                    break;
+                case "postal_code":
+                    locObj.zip = val
+                    break;
+            }
+            // document.getElementById(addressType).value = val;
+        }
+    }
+    locObj.cityState = locObj.city + ", " + locObj.state;
+    console.log(locObj);
+}
+function establishLocation(source) {
+    loadCnt++;
+    if(source === "IP") {
+        $.getJSON('https://geoip-db.com/json/').done(
+            function(location) {
+                locObj = new Location(
+                        location.latitude,
+                        location.longitude,
+                        location.postal,
+                        location.city,
+                        location.state,
+                        location.city + ", " + stateByName[location.state],
+                        "IP"
+                    )
+                if(loadCnt == 1) {initCityState = locObj.cityState}
+                    console.log(loadCnt + ": " + locObj.cityState)
+                    console.log(locObj)
+                $("#location").val(locObj.cityState);
+                setNavFeaturesWidth();
+                // $("#location").attr('size', $("#location").val().length)
+            }
+        );
+    } else if (source === "click") {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    var loc = {"lat": position.coords.latitude, "lng": position.coords.longitude}
+                    var circle = new google.maps.Circle({center: loc, radius: position.coords.accuracy});
+                    autocomplete.setBounds(circle.getBounds());
+                    locObj.lat = position.coords.latitude;
+                    locObj.lng = position.coords.longitude;
+                    fillFromLatLng();
+                    locObj.source = "click"
+
+                    console.log("position")
+                    console.log(position)
+                },
+                function() {
+                    //do nothing on declination
+                });
+        }
+    } else {
+        alert("called establish with no value")
+    }
+}
+
+function setNavFeaturesWidth(){
+    var locInputBox = $("#location");
+    if($(window).width() <= 800) {
+        console.log('resized-small')
+        locInputBox.attr('size',"30")
+        // locInputBox.removeClass("form-control-inline");
+        // locInputBox.addClass("form-control");
+    } else {
+        locInputBox.attr('size', "50");
+        // locInputBox.removeClass("form-control");
+        // locInputBox.addClass("form-control-inline");
+    }
+}

@@ -9,56 +9,104 @@
 
     <link rel="stylesheet" href="assets/css/reset.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/style.css">
-    
+    <link rel="stylesheet" href="./assets/css/style.css">
     </head>
 
 
 <body>
-    <div id="main" class="container">
-        <div id="location"></div>
-        <div class="row">
-            <div class="card col-md-12">
-                    <form class="form-group">
-                        <h4 class="card-header col-md-12">
-                            Please Select Your Activity Details
-                        </h4>
-                        <div class="form-row">
-                            <p></p>
-                            <h5>
-                                Location Zip Code
-                            </h5>
-                        </div><div class="form-row">
-                            <!-- testing vue zip lookup found here https://vuejsfeed.com/blog/vue-js-zip-code-finder -->
-                            <div id="zip-app" class="col-md-5">    
-                                <input id="input-zip" type="text" class="form-control"  v-model="zip" maxlength="5" placeholder="ex: 94301" />
-                                <div class="error">{{error}}</div>
-                                <div class="display">{{cityString}}</div>
-                            </div>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">WeatherActivityPlanner.com</a>
+        <form class="form-inline my-2 my-lg-0">
+            <label for="location" class="input-label mr-2">Conditions around: </label>
+            <input id="location" class="form-control-inline mr-sm-2" type="text" placeholder="Enter location..." aria-label="Geo Location">
+            <button id="geolocate" class="btn btn-sm btn-outline-primary ml-2 my-sm-0" type="submit"><i class="fa fa-location-arrow"></i></button>
+        </form>
+        <ul id="navleft" class="nav navbar-nav mx-auto">
+            <div id="hideListButton" class="btn btn-sm btn-outline-primary m-2" style="display: none;"><a href="#">Hide List</a></div>
+            <li class="m-2">Selected Activities: <span id="activitiesCnt">0</span></li>
+            <a id="submit-search" href="#"class="btn btn-sm btn-primary m-2 disabled">Go</a>
+        </ul>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+        <ul class="nav navbar-right my-2 my-lg-0">
+            <img id="signIn" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png"  class="my-2 my-sm-0 google-click main"></img>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <div id="welcome-msg" class="row">
+            <div id="site-use-outline" class="col my-2">
+                <div class="card">
+                    <div class="card-header"><h5>Site User Overview</h5></div>
+                    <div class="card-body">
+                        <h5>Welcome to WeatherActivtyPlanner.com</h5>
+                        <p>This card holds the outline Andrea wanted to house the "How-to" and highlight google log-in</p>
+                        <img src="./assets/images/signin-assets/google_signin_buttons/web/2x/btn_google_signin_dark_normal_web@2x.png"  class="my-2 my-sm-0 google-click body"></img>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row my-2" id="activities-list">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header"><h5>Available Default Activity Profiles</h5></div>
+                    <div class="card-body">
+                        <form id="activities" class="form-inline activities"></form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row my-2" id="weather-results" style="display: none;">
+            <div class="col-lg-12">
+                <div class="alert alert-success mt-4">Here is your 5 day outlook</div>
+                <div class="card-group">
+                    <div class="card">
+                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
+                        <div class="card-body">
+                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
+                            </ul>
                         </div>
-                        <hr> <!-- line divider -->
-                        <div class="form-row">
-                            <h5>
-                                Desired Activities
-                            </h5>
-                            <div id="activities" class="form-check form-check-inline col-md-12">
-                                <input class="form-check-input" type="checkbox" id="act-cycling" v-model="checkedAct" value="Cycling">
-                                <label class="form-check-label mr-3" for="act-cycling">Cycling</label>
-                                <input class="form-check-input" type="checkbox" id="act-running" v-model="checkedAct" value="Running">
-                                <label class="form-check-label mr-3" for="act-running">Running</label>
-                                <input class="form-check-input" type="checkbox" id="act-golfing" v-model="checkedAct" value="Golfing">
-                                <label class="form-check-label mr-3" for="act-golfing">Golfing</label>
-                                <br>
-                                <span>Checked Activities: {{ checkedAct }}</span>
-                            </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
+                        <div class="card-body">
+                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
+                            </ul>
                         </div>
-                        <div class="form-row">
-                            <div class="col-md-12 text-center">
-                                <p></p>
-                                <button id="submit-search" class="btn btn-primary" type="submit">Submit</button>
-                            </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
+                        <div class="card-body">
+                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
+                            </ul>
                         </div>
-                    </form> 
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
+                        <div class="card-body">
+                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
+                        <div class="card-body">
+                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         
@@ -167,11 +215,39 @@
 
 
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+        </div>
+    </div>
+
+    <div id="changeInput" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Address Input</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Did you wish to modify the current location?
+            </div>
+            <div class="modal-footer">
+                <button id="updateAddConfirm" type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
     <script src="assets/javascript/script.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1vF8yaKPsWrNQPDkPj54ntPtTGoNa1fA&libraries=places&callback=initAutocomplete" async defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </body>
 
 </html>

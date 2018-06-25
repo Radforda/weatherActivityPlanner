@@ -7,3 +7,6 @@
 .card-body{
     padding:0px;
 }
+.pac-container{
+    z-index: 8000;
+   }
