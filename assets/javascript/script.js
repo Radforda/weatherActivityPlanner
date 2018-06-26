@@ -397,7 +397,7 @@ $(document).ready(function(){
     establishLocation("IP");
     loadActivitiesStandard();
     $("#location").focus(locationUpdate);
-    $("#location").focusout(locLoseFocus);
+    $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     $("#geolocate").click(loadGeoLocate);
     $("#submit-search").on("click",OutputButtonClick)    
     $("#updateAddConfirm").click(confirmUpdateAddressModal);
