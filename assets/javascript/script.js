@@ -9,7 +9,7 @@ var userPref = {
     isGoogle: false,
     email: "",
     zipCode: ""
-}
+};
 
 var statesByAbb = {
     "AL": "Alabama",
@@ -72,6 +72,7 @@ var statesByAbb = {
     "WI": "Wisconsin",
     "WY": "Wyoming"
     };
+var stateByName = swap(statesByAbb);
 var activities, autocomplete, locObj, $checkboxes, initCityState
 var loadCnt = 0;
 var componentForm = {
@@ -82,7 +83,6 @@ var componentForm = {
     country: 'long_name',
     postal_code: 'short_name'
 };
-
 var displayDays=[]
 
 //function to map API response object to application object
@@ -131,10 +131,6 @@ getForecast();
 // all units should be in F mph 
 
 //variables
-<<<<<<< HEAD
-=======
-console.log("Javascript file was loaded")
->>>>>>> master
 var Running = {
     name: "Running",
     tempMax: 80,
@@ -281,7 +277,6 @@ var config = {
 firebase.initializeApp(config);
 var provider = new firebase.auth.GoogleAuthProvider();
   
-<<<<<<< HEAD
 function getActObjectsFromArr(){
     var arr = [];
     for(var i = 0; i < activities.length; i++) {
@@ -344,6 +339,8 @@ function checkVisible( elm, evalType ) {
 
 function OutputButtonClick (event) {
     event.preventDefault();
+    console.log(activities)
+    selectedActivityArray = activities;
     if(typeof selectedActivityArray == "undefined" ||selectedActivityArray.length == 0) {
         $("#noActivities").modal();
         return
@@ -354,7 +351,7 @@ function OutputButtonClick (event) {
         zipCode = locObj.zip
         getForecast();
         //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)
-        selectedActivityArray = activities;
+        
         checkWeather();
     $(window).resize(function(){setNavFeaturesWidth()});
 }
@@ -383,16 +380,11 @@ function loadGeoLocate(event){
 
 function signInProcedure(){
     //Google Sign in
-=======
-  //Google Sign in
- $(".signIn").on("click", function(){
->>>>>>> master
     console.log("sign in clicked")
     firebase.auth().signInWithPopup(provider).then(function(result) {
     // This gives you a Google Access Token. You can use it to access the Google API.
     var token = result.credential.accessToken;
     // The signed-in user info.
-<<<<<<< HEAD
     user = result.user;
     //check if save modal is vsible to determine if load or pull
     if(checkVisible($("#saveModal","visible")) == true) {
@@ -400,11 +392,6 @@ function signInProcedure(){
     } else {
       pullPref();
     }
-    console.log(user);
-=======
-    var user = result.user;
-    console.log("user object:"+user);
->>>>>>> master
     // ...
     }).catch(function(error) {
         // Handle Errors here.
@@ -418,7 +405,6 @@ function signInProcedure(){
     });
 }
 
-<<<<<<< HEAD
 function confirmUpdateAddressModal(){
     $("#location").val("").attr("placeholder","Enter location ...")
     .focus();
@@ -437,14 +423,11 @@ function ActivityCheckboxUpdate(){
     }
 }
 
-=======
->>>>>>> master
 $(document).ready(function(){
     $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
     $(".signIn").on("click", signInProcedure);
     establishLocation("IP");
     loadActivitiesStandard();
-<<<<<<< HEAD
     $("#location").focus(locationUpdate);
     $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     $("#geolocate").click(loadGeoLocate);
@@ -454,161 +437,13 @@ $(document).ready(function(){
 
 
 //Daniel Code
-=======
-    $("#location").focus(function(){
-        console.log("current: " + $(this).val() +" Init: " + initCityState)
-        if($(this).val() === initCityState || $(this).val() === "") {
-            $(this).val("").attr("placeholder","Enter location ...");
-            // document.getElementById("location").style.zIndex = 0;
-        } else {
-            $("#changeInput").modal();
-        }
-    });
-
-    $("#location").focusout(function(){
-        if($(this).val() == "") {$(this).val(locObj.cityState)};
-        setNavFeaturesWidth();
-        // $(this).attr('size', $(this).val().length)
-    });
-
-    $("#geolocate").on("click",function(event) {
-        event.preventDefault();
-        establishLocation("click");
-    });
-
-    $("#submit-search").on("click",function(event) {
-        event.preventDefault();
-        if($("#submit-search").text() == "Go") {
-            //ui updates to show first load or reset
-            $("#welcome-msg").hide();
-            $("#weather-results").show();
-            $("#activities-list").hide();
-            $("#submit-search").text("Reset");
-            
-            //added changes for updated structure
-            zipCode = locObj.zip
-            getForecast();
-            //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)
-            selectedActivityArray = activities;
-            checkWeather();
-        } else {
-            $("#weather-results").hide();
-            $("#activities-list").show();
-            $("#submit-search").text("Go");
-        }
-
-        $(window).resize(function(){setNavFeaturesWidth()});
-    });
-    
-    $("#updateAddConfirm").click(function(){
-        $("#location").val("").attr("placeholder","Enter location ...")
-        .focus();
-    });
-    $checkboxes = $('#activities input[type="checkbox"]');
-    $('#activities input[type="checkbox"]').change(        
-        function (){
-            var searchButton = $("#submit-search");
-            var actElArr = $checkboxes.filter(':checked')
-            $('#activitiesCnt').text(actElArr.length);
-            if(actElArr.length > 0) {
-                searchButton.removeClass("disabled");
-                activities = actElArr.map(function(){return $(this).val()}).get();
-            } else {
-                searchButton.addClass("disabled")
-                activities = [];
-            }
-        }
-    );
-})
-
-//Daniel Code
-//variables
-var statesByAbb = {
-    "AL": "Alabama",
-    "AK": "Alaska",
-    "AS": "American Samoa",
-    "AZ": "Arizona",
-    "AR": "Arkansas",
-    "CA": "California",
-    "CO": "Colorado",
-    "CT": "Connecticut",
-    "DE": "Delaware",
-    "DC": "District Of Columbia",
-    "FM": "Federated States Of Micronesia",
-    "FL": "Florida",
-    "GA": "Georgia",
-    "GU": "Guam",
-    "HI": "Hawaii",
-    "ID": "Idaho",
-    "IL": "Illinois",
-    "IN": "Indiana",
-    "IA": "Iowa",
-    "KS": "Kansas",
-    "KY": "Kentucky",
-    "LA": "Louisiana",
-    "ME": "Maine",
-    "MH": "Marshall Islands",
-    "MD": "Maryland",
-    "MA": "Massachusetts",
-    "MI": "Michigan",
-    "MN": "Minnesota",
-    "MS": "Mississippi",
-    "MO": "Missouri",
-    "MT": "Montana",
-    "NE": "Nebraska",
-    "NV": "Nevada",
-    "NH": "New Hampshire",
-    "NJ": "New Jersey",
-    "NM": "New Mexico",
-    "NY": "New York",
-    "NC": "North Carolina",
-    "ND": "North Dakota",
-    "MP": "Northern Mariana Islands",
-    "OH": "Ohio",
-    "OK": "Oklahoma",
-    "OR": "Oregon",
-    "PW": "Palau",
-    "PA": "Pennsylvania",
-    "PR": "Puerto Rico",
-    "RI": "Rhode Island",
-    "SC": "South Carolina",
-    "SD": "South Dakota",
-    "TN": "Tennessee",
-    "TX": "Texas",
-    "UT": "Utah",
-    "VT": "Vermont",
-    "VI": "Virgin Islands",
-    "VA": "Virginia",
-    "WA": "Washington",
-    "WV": "West Virginia",
-    "WI": "Wisconsin",
-    "WY": "Wyoming"
-    };
-var activities, autocomplete, locObj, $checkboxes, initCityState
-var loadCnt = 0;
-var stateByName = swap(statesByAbb);
-var componentForm = {
-    street_number: 'short_name',
-    route: 'long_name',
-    locality: 'long_name',
-    administrative_area_level_1: 'short_name',
-    country: 'long_name',
-    postal_code: 'short_name'
-};
-
-//functions
->>>>>>> master
 function swap(json) {
     var ret = {};
     for(var key in json){ret[json[key]] = key};
     return ret;
 }
 function loadActivitiesStandard() {
-<<<<<<< HEAD
 var actForm = $("#activities");
-=======
-    var actForm = $("#activities");
->>>>>>> master
     $("#activities-list").show();
     actForm.empty();
     for(var i = 0; i < listedActivties.length; i++) {
@@ -694,19 +529,17 @@ function establishLocation(source) {
     $("#location-loading").show();
     if(source === "IP") {
         $.getJSON('https://geoip-db.com/json/').done(
-            function(location) {
+            function(results) {
                 locObj = new Location(
-                        location.latitude,
-                        location.longitude,
-                        location.postal,
-                        location.city,
-                        location.state,
-                        location.city + ", " + stateByName[location.state],
-                        "IP"
-                    )
-                if(loadCnt == 1) {initCityState = locObj.cityState}
-                    console.log(loadCnt + ": " + locObj.cityState)
-                    console.log(locObj)
+                    results.latitude,
+                    results.longitude,
+                    results.postal,
+                    results.city,
+                    results.state,
+                    results.city + ", " + stateByName[results.state],"IP")
+                if(loadCnt == 1) {
+                    initCityState = locObj.cityState;
+                };
                 $("#location").val(locObj.cityState);
                 $("#location-loading").hide();
                 setNavFeaturesWidth();
