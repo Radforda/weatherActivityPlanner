@@ -83,12 +83,17 @@ var componentForm = {
     postal_code: 'short_name'
 };
 
+var displayDays=[]
+
 //function to map API response object to application object
 function mapForecastObject(data) {
     data.list.forEach(element => {
         var day = {
             date: moment(element.dt_txt).format('LLL'),
-            name: element.dt_txt,
+            number:Number(moment(element.dt_txt).format("DD")),
+            name: moment(element.dt_txt).format('dddd'),
+            time:Number(moment(element.dt_txt).format("HH")),
+            displayTime:(moment(element.dt_txt).format("LT")),
             tempMax: (parseFloat(element.main.temp_max - 273.15) * 1.8) + 32,/*Converting temp from Kelvin to Farenheit*/
             tempMin: (parseFloat(element.main.temp_max - 273.15) * 1.8) + 32,/*Converting temp from Kelvin to Farenheit*/
             windMin: element.wind.speed,
@@ -119,10 +124,17 @@ function getForecast() {
     });
 }
 
+
+
+getForecast();
 // getForecast();
 // all units should be in F mph 
 
 //variables
+<<<<<<< HEAD
+=======
+console.log("Javascript file was loaded")
+>>>>>>> master
 var Running = {
     name: "Running",
     tempMax: 80,
@@ -176,42 +188,67 @@ var day2 = {
 };
 
 
-//We need link to radio buttons to populate this array
+
 var listedActivties = [Cycling, Running, Golfing]
 var selectedActivityArray = [];
 var dayArray = [day1, day2];
+var displayDay=[];
+var currentDay=Number(moment().format("DD"));
+console.log("currentDay"+currentDay);
+comparisonDay=currentDay+1;
+var card="";
+var cardTime="";
+var cardActivity="";
+
+var cardNumber=0;
 
 //functions
 
 //this will be called inside the api call or to run after the call is complete and the days have been assigned value
-
-
-//loops through the activies array and day array and runs isItAGoodDay function to compare them.
-/*function checkWeather(){
-    console.log("check weather is running");
-    console.log("selected activity array length: "+selectedActivityArray.length);
-    console.log("day array length: "+dayArray.length)
-    for (var i=0; i<selectedActivityArray.length; i++){
-        console.log("i: "+i);
-        for(var j=0; j<dayArray.length;j++){
-            var activityObject = window[selectedActivityArray[i]];
-            console.log("j: "+j);
-            isItAGoodDay(activityObject, dayArray[j]);
-        };
-    };
-}; */
 function checkWeather() {
+    
     console.log("check weather is running");
     console.log("selected activity array length: " + selectedActivityArray.length);
     console.log("day array length: " + forecastDays.length)
-    for (var i = 0; i < selectedActivityArray.length; i++) {
-        console.log("i: " + i);
-        for (var j = 0; j < forecastDays.length; j++) {
+
+    for (var j = 0; j < forecastDays.length; j++) {
+        console.log("j: " + j);
+        console.log(forecastDays[j].number+"  "+currentDay+" "+comparisonDay)
+        if (forecastDays[j].number!=currentDay&&forecastDays[j].time<=21&&forecastDays[j].time>=9){
+            if (forecastDays[j].number==comparisonDay){
+                if (forecastDays[j]!=currentDay+1){
+                    $("#results").append(card);
+                }
+
+                console.log("creating card");
+                comparisonDay++;
+                card=$("<div>").addClass("card").html("");
+                cardHeader=$('<h5>').addClass("card-header").text(forecastDays[j].name);
+                cardBody=$("<div>").addClass("card-body").html("");
+                cardTime=$("<div>").addClass('cardDay').html("<h5>"+forecastDays[j].displayTime+"</h5>");
+                
+                cardBody.append(cardTime);
+                card.append(cardHeader);
+                card.append(cardBody);
+                
+            } 
+                else{
+                    console.log(card);
+                    cardTime=$("<div>").addClass('cardDay').html("<h5>"+forecastDays[j].displayTime+"</h5>");
+                    card.append(cardTime);
+            };
+
+
+            for (var i = 0; i < selectedActivityArray.length; i++) {
+            console.log("i: " + i);
             var activityObject = window[selectedActivityArray[i]];
-            console.log("j: " + j);
+            
+            console.log(activityObject);
+            console.log(forecastDays[j]);
             isItAGoodDay(activityObject, forecastDays[j]);
         };
     };
+};
 };
 
 //compare activity properties to day properties to determine if the activity is recomended for that day the console.log it.
@@ -219,17 +256,15 @@ function checkWeather() {
 function isItAGoodDay(activity, day) {
     console.log("checking if " + day.date + " is a good day for " + activity.name + ".");
     if (activity.tempMax > day.tempMax && activity.tempMin < day.tempMin) {
-        console.log("The temp is good")
         if (activity.windMax > day.windMin && activity.windMin < day.windMin) {
-            console.log("The wind is good")
             if (activity.skyCondition.indexOf(day.skyCondition) <= 0) {
-                console.log("the sky condition is good");
                 if (activity.precip.indexOf(day.precip) <= 0) {
+                    cardTime.append("<p>"+activity.name+"</p>");
                     console.log(activity.name + " is recommended for " + day.name);
-                } else { console.log(activity.name + ' is not recommended due to ' + day.precip) };
-            } else { console.log(activity.name + ' is not recommended due to skycondition') };
-        } else { console.log(activity.name + ' is not recommended due to wind') };
-    } else { console.log(activity.name + ' is not recommended due to the tempurature') };
+                } else { };
+            } else { };
+        } else {};
+    } else {  };
 
 };
 
@@ -246,6 +281,7 @@ var config = {
 firebase.initializeApp(config);
 var provider = new firebase.auth.GoogleAuthProvider();
   
+<<<<<<< HEAD
 function getActObjectsFromArr(){
     var arr = [];
     for(var i = 0; i < activities.length; i++) {
@@ -347,11 +383,16 @@ function loadGeoLocate(event){
 
 function signInProcedure(){
     //Google Sign in
+=======
+  //Google Sign in
+ $(".signIn").on("click", function(){
+>>>>>>> master
     console.log("sign in clicked")
     firebase.auth().signInWithPopup(provider).then(function(result) {
     // This gives you a Google Access Token. You can use it to access the Google API.
     var token = result.credential.accessToken;
     // The signed-in user info.
+<<<<<<< HEAD
     user = result.user;
     //check if save modal is vsible to determine if load or pull
     if(checkVisible($("#saveModal","visible")) == true) {
@@ -360,6 +401,10 @@ function signInProcedure(){
       pullPref();
     }
     console.log(user);
+=======
+    var user = result.user;
+    console.log("user object:"+user);
+>>>>>>> master
     // ...
     }).catch(function(error) {
         // Handle Errors here.
@@ -373,6 +418,7 @@ function signInProcedure(){
     });
 }
 
+<<<<<<< HEAD
 function confirmUpdateAddressModal(){
     $("#location").val("").attr("placeholder","Enter location ...")
     .focus();
@@ -391,11 +437,14 @@ function ActivityCheckboxUpdate(){
     }
 }
 
+=======
+>>>>>>> master
 $(document).ready(function(){
     $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
     $(".signIn").on("click", signInProcedure);
     establishLocation("IP");
     loadActivitiesStandard();
+<<<<<<< HEAD
     $("#location").focus(locationUpdate);
     $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     $("#geolocate").click(loadGeoLocate);
@@ -405,15 +454,161 @@ $(document).ready(function(){
 
 
 //Daniel Code
+=======
+    $("#location").focus(function(){
+        console.log("current: " + $(this).val() +" Init: " + initCityState)
+        if($(this).val() === initCityState || $(this).val() === "") {
+            $(this).val("").attr("placeholder","Enter location ...");
+            // document.getElementById("location").style.zIndex = 0;
+        } else {
+            $("#changeInput").modal();
+        }
+    });
+
+    $("#location").focusout(function(){
+        if($(this).val() == "") {$(this).val(locObj.cityState)};
+        setNavFeaturesWidth();
+        // $(this).attr('size', $(this).val().length)
+    });
+
+    $("#geolocate").on("click",function(event) {
+        event.preventDefault();
+        establishLocation("click");
+    });
+
+    $("#submit-search").on("click",function(event) {
+        event.preventDefault();
+        if($("#submit-search").text() == "Go") {
+            //ui updates to show first load or reset
+            $("#welcome-msg").hide();
+            $("#weather-results").show();
+            $("#activities-list").hide();
+            $("#submit-search").text("Reset");
+            
+            //added changes for updated structure
+            zipCode = locObj.zip
+            getForecast();
+            //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)
+            selectedActivityArray = activities;
+            checkWeather();
+        } else {
+            $("#weather-results").hide();
+            $("#activities-list").show();
+            $("#submit-search").text("Go");
+        }
+
+        $(window).resize(function(){setNavFeaturesWidth()});
+    });
+    
+    $("#updateAddConfirm").click(function(){
+        $("#location").val("").attr("placeholder","Enter location ...")
+        .focus();
+    });
+    $checkboxes = $('#activities input[type="checkbox"]');
+    $('#activities input[type="checkbox"]').change(        
+        function (){
+            var searchButton = $("#submit-search");
+            var actElArr = $checkboxes.filter(':checked')
+            $('#activitiesCnt').text(actElArr.length);
+            if(actElArr.length > 0) {
+                searchButton.removeClass("disabled");
+                activities = actElArr.map(function(){return $(this).val()}).get();
+            } else {
+                searchButton.addClass("disabled")
+                activities = [];
+            }
+        }
+    );
+})
+
+//Daniel Code
+//variables
+var statesByAbb = {
+    "AL": "Alabama",
+    "AK": "Alaska",
+    "AS": "American Samoa",
+    "AZ": "Arizona",
+    "AR": "Arkansas",
+    "CA": "California",
+    "CO": "Colorado",
+    "CT": "Connecticut",
+    "DE": "Delaware",
+    "DC": "District Of Columbia",
+    "FM": "Federated States Of Micronesia",
+    "FL": "Florida",
+    "GA": "Georgia",
+    "GU": "Guam",
+    "HI": "Hawaii",
+    "ID": "Idaho",
+    "IL": "Illinois",
+    "IN": "Indiana",
+    "IA": "Iowa",
+    "KS": "Kansas",
+    "KY": "Kentucky",
+    "LA": "Louisiana",
+    "ME": "Maine",
+    "MH": "Marshall Islands",
+    "MD": "Maryland",
+    "MA": "Massachusetts",
+    "MI": "Michigan",
+    "MN": "Minnesota",
+    "MS": "Mississippi",
+    "MO": "Missouri",
+    "MT": "Montana",
+    "NE": "Nebraska",
+    "NV": "Nevada",
+    "NH": "New Hampshire",
+    "NJ": "New Jersey",
+    "NM": "New Mexico",
+    "NY": "New York",
+    "NC": "North Carolina",
+    "ND": "North Dakota",
+    "MP": "Northern Mariana Islands",
+    "OH": "Ohio",
+    "OK": "Oklahoma",
+    "OR": "Oregon",
+    "PW": "Palau",
+    "PA": "Pennsylvania",
+    "PR": "Puerto Rico",
+    "RI": "Rhode Island",
+    "SC": "South Carolina",
+    "SD": "South Dakota",
+    "TN": "Tennessee",
+    "TX": "Texas",
+    "UT": "Utah",
+    "VT": "Vermont",
+    "VI": "Virgin Islands",
+    "VA": "Virginia",
+    "WA": "Washington",
+    "WV": "West Virginia",
+    "WI": "Wisconsin",
+    "WY": "Wyoming"
+    };
+var activities, autocomplete, locObj, $checkboxes, initCityState
+var loadCnt = 0;
+var stateByName = swap(statesByAbb);
+var componentForm = {
+    street_number: 'short_name',
+    route: 'long_name',
+    locality: 'long_name',
+    administrative_area_level_1: 'short_name',
+    country: 'long_name',
+    postal_code: 'short_name'
+};
+
+//functions
+>>>>>>> master
 function swap(json) {
     var ret = {};
     for(var key in json){ret[json[key]] = key};
     return ret;
 }
-var stateByName = swap(statesByAbb);
-
 function loadActivitiesStandard() {
+<<<<<<< HEAD
 var actForm = $("#activities");
+=======
+    var actForm = $("#activities");
+>>>>>>> master
     $("#activities-list").show();
     actForm.empty();
     for(var i = 0; i < listedActivties.length; i++) {
@@ -428,7 +623,6 @@ var actForm = $("#activities");
         // $("#act-" + activityNameStr).text(activityNameStr)
     }
 }
-
 function Location(lat,lng,zip,city,state,cityState,source){
     this.lat = lat;
     this.lng = lng;
@@ -438,7 +632,6 @@ function Location(lat,lng,zip,city,state,cityState,source){
     this.cityState = cityState;
     this.source = source;
 }
-
 function initAutocomplete() {
     autocomplete = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('location')),
@@ -543,7 +736,6 @@ function establishLocation(source) {
         alert("called establish with no value")
     }
 }
-
 function setNavFeaturesWidth(){
     var locInputBox = $("#location");
     if($(window).width() <= 800) {
