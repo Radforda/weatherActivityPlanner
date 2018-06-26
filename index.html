@@ -7,46 +7,104 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Weather Activity Planner</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="./assets/css/style.css">
     </head>
 <body>
-    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">WeatherActivityPlanner.com</a>
-        <form class="form-inline my-2 my-lg-0">
-            <label for="location" class="input-label mr-2">Conditions around: </label>
-            <input id="location" class="form-control-inline mr-sm-2" type="text" placeholder="Enter location..." aria-label="Geo Location">
-            <button id="geolocate" class="btn btn-sm btn-outline-primary ml-2 my-sm-0" type="submit"><i class="fa fa-location-arrow"></i></button>
-        </form>
-        <ul id="navleft" class="nav navbar-nav mx-auto">
-            <div id="hideListButton" class="btn btn-sm btn-outline-primary m-2" style="display: none;"><a href="#">Hide List</a></div>
-            <li class="m-2">Selected Activities: <span id="activitiesCnt">0</span></li>
-            <a id="submit-search" href="#"class="btn btn-sm btn-primary m-2 disabled">Go</a>
-        </ul>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <nav id="navMain-Load" class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">WeatherActivityPlanner.com</a>
+            <button class="navbar-toggler border-0" type="button" data-toggle="collapse" data-target="#exCollapsingNavbar">
+                &#9776;
+            </button>
+            <ul class="nav navbar-nav">
+                <div class="collapse navbar-collapse" id="exCollapsingNavbar">
+                    <ul class="nav navbar-nav flex-row justify-content-between ml-auto">
+                        <form class="form-inline my-2 mx-auto">
+                            <label for="location" class="input-label m-1">Conditions around:
+                            <i id="location-loading" class="fa fa-spinner fa-spin fa-2x" style="display: none;"></i>
+                            <input id="location" class="form-control-inline ml-1" type="text" placeholder="Retrieving nearby city..." aria-label="Geo Location" size="25">
+                            <button id="geolocate" class="btn btn-sm btn-outline-primary ml-2 my-sm-0" type="submit">
+                                    <i class="fa fa-location-arrow"></i>
+                            </button>
+                        </form>
+                        <ul id="navleft" class="nav navbar-nav mx-auto">
+                            <form class="form-inline m-2">
+                                <div class="form-group text-center">
+                                    <input id="actCount" class="text-center" size="1" value="0" readonly>
+                                    <label for="actCount" class="m-2 text-right">Selected Activities:
+                                </div>
+                                <div class="form-group text-center">
+                                    <a id="submit-search" href="#"class="btn btn-sm btn-primary m-2">Go</a>
+                                </div>
+                            </form>
+                        </ul>
+                    </ul>
+                    <ul class="nav navbar-nav flex-row justify-content-between ml-auto">
+                        <li class="dropdown order-1">
+                            <button type="button" id="dropdownMenu1" data-toggle="dropdown" class="btn btn-outline-primary dropdown-toggle">Returning User? <span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right mt-2">
+                                <li class="px-3 py-2">
+                                    <form class="form" role="form">
+                                        <div class="form-group">
+                                            <label for="emailInput">Enter your email</label>
+                                            <input id="emailInput" placeholder="sample@address.com" class="form-control form-control-sm" type="text" required="">
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary btn-block">Get Activities</button>
+                                        </div>
+                                        <div class="form-group text-center">OR</div>
+                                        <div class="form-group text-center">
+                                            <li><img id="signIn" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png"  class="my-2 my-sm-0 google-click main"></li>
+                                        </div>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </ul>
         </div>
-        <ul class="nav navbar-right my-2 my-lg-0">
-            <img id="signIn" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png"  class="my-2 my-sm-0 google-click main"></img>
-        </ul>
     </nav>
-    
-    <div class="container">
-        <div id="welcome-msg" class="row">
-            <div id="site-use-outline" class="col my-2">
-                <div class="card">
-                    <div class="card-header"><h5>Site User Overview</h5></div>
-                    <div class="card-body">
-                        <h5>Welcome to WeatherActivtyPlanner.com</h5>
-                        <p>This card holds the outline Andrea wanted to house the "How-to" and highlight google log-in</p>
-                        <img src="./assets/images/signin-assets/google_signin_buttons/web/2x/btn_google_signin_dark_normal_web@2x.png"  class="my-2 my-sm-0 google-click body"></img>
+
+        <!-- <li class="nav-item dropdown" style="display: block">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Previously Save Activities?
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <div class="row">
+                    <div class="col-md-12">
+                        Retrieve via:
+                        <form>
+                            <div class="form-group">
+                                <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                                <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email address" required>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-sm">Sign In</button><br>
+                            </div>
+                            OR
+                            <br><img id="signIn" class="google-click main mx-2" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png">
+                        </form>
                     </div>
                 </div>
             </div>
-        </div>
+        </li> -->
+        <!-- <button id="navCollapseToggler" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation" style="display: none;"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="nav navbar-right my-2 my-lg-0">
+                <li><img id="signIn" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png"  class="my-2 my-sm-0 google-click main"></li>
+                <li><a id="logOut" href="#"><h5>w.daniel@gmail.com <i class="fa fa-user-circle-o fa-2x" aria-hidden="true"></i></h5></a></li>
+            </ul>
+        </div> -->
 
+    <div class="container">
         <div class="row my-2" id="activities-list">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header"><h5>Available Default Activity Profiles</h5></div>
+                    <div class="card-header">
+                        <h5>Select Your Activity Profile(s)</h5>
+                    </div>
                     <div class="card-body">
                         <form id="activities" class="form-inline activities"></form>
                     </div>
@@ -55,58 +113,10 @@
         </div>
         
         <div class="row my-2" id="weather-results" style="display: none;">
-            <div class="col-lg-12">
-                <div class="alert alert-success mt-4">Here is your 5 day outlook</div>
-                <div class="card-group">
-                    <div class="card">
-                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
-                        <div class="card-body">
-                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
-                        <div class="card-body">
-                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
-                        <div class="card-body">
-                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
-                        <div class="card-body">
-                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><h5>Sample: Monday, June 25th</h5></div>
-                        <div class="card-body">
-                            <h5>AM (9a-12p) - 85 &#8457; - Partly Cloudy</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item">Running - Great! <i class="fa fa-check" style="color:green"></i></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
+
+
+
 
     <div id="changeInput" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -127,7 +137,25 @@
             </div>
         </div>
     </div>
-
+    
+    <div id="noActivities" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">No Activities Selected</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Please select an activity from the list and try again.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
@@ -137,7 +165,7 @@
     <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
     <script src="assets/javascript/script.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1vF8yaKPsWrNQPDkPj54ntPtTGoNa1fA&libraries=places&callback=initAutocomplete" async defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
 </body>
 
 </html>
