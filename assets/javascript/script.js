@@ -55,61 +55,101 @@ getForecast();
 console.log("Javascript file was loaded")
 var Running = {
     name: "Running",
-    tempMax: 80,
-    tempMin: 55,
+    tempMax: 85,
+    tempMin: 40,
     windMin: 0,
-    windMax: 20,
+    windMax: 25,
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-    precip: ['none']
+    
 };
 
 var Cycling = {
     name: "Cycling",
-    tempMax: 110,
-    tempMin: 60,
+    tempMax: 90,
+    tempMin: 40,
     windMin: 10,
     windMax: 20,
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-    precip: ['none', 'lightRain']
+ 
 };
 
 var Golfing = {
     name: "Golfing",
-    tempMax: 110,
-    tempMin: 60,
+    tempMax: 95,
+    tempMin: 50,
+    windMin: 0,
+    windMax: 20,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+};
+
+var Camping = {
+    name: "Camping",
+    tempMax: 90,
+    tempMin: 55,
+    windMin: 0,
+    windMax: 25,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+};
+
+var BeachCamping = {
+    name: "Beach Camping",
+    tempMax: 100,
+    tempMin: 80,
+    windMin: 0,
+    windMax: 15,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+};
+
+var Beach= {
+    name: "Beach",
+    tempMax: 120,
+    tempMin: 75,
+    windMin: 0,
+    windMax: 25,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+};
+
+var Sailing= {
+    name: "Sailing",
+    tempMax: 95,
+    tempMin: 55,
     windMin: 10,
     windMax: 20,
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-    precip: ['none', 'lightRain']
 };
 
-//days will be populated with weather API data these are test days currently
-var day1 = {
-    name: "Monday",
-    tempMax: 70,
-    tempMin: 65,
+var Snowboarding= {
+    name: "Snowboarding",
+    tempMax: 32,
+    tempMin: -20,
+    windMin: 0,
+    windMax: 15,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+};
+
+var HangGliding= {
+    name: "Hang Gliding",
+    tempMax: 95,
+    tempMin: 55,
     windMin: 15,
-    windMax: 17,
-    skyCondition: "clear",
-    precip: 'none'
-
+    windMax: 30,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
-var day2 = {
-    name: "tuesday",
-    tempMax: 70,
-    tempMin: 60,
+var KiteFlying= {
+    name: "Kite Flying",
+    tempMax: 95,
+    tempMin: 55,
     windMin: 10,
-    windMax: 20,
-    skyCondition: 'clear',
-    precip: 'none'
+    windMax: 25,
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
 
 
-var listedActivties = [Cycling, Running, Golfing]
+var listedActivties = [Cycling, Running, Golfing, Sailing, Beach, BeachCamping, Camping, HangGliding, KiteFlying];
 var selectedActivityArray = [];
-var dayArray = [day1, day2];
+
 var displayDay=[];
 var currentDay=Number(moment().format("DD"));
 console.log("currentDay"+currentDay);
