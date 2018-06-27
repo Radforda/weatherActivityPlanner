@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    
 
     <link rel="stylesheet" href="./assets/css/style.css">
     </head>
@@ -33,7 +32,7 @@
             <ul class="nav navbar-nav">
                 <ul class="nav navbar-nav flex-row justify-content-between ml-auto">
                     <li class="dropdown order-1">
-                        <button id="loggedIn" data-toggle="dropdown" class="btn btn-light btn-sm dropdown-toggle loggedIn" style="display: none" data-status="Out">sample@email.com<i class="fa fa-user-circle-o fa-2x pl-1" aria-hidden="true"></i></button>
+                        <button id="loggedIn" data-toggle="dropdown" class="btn btn-light btn-sm dropdown-toggle loggedIn" style="display: none" data-status="Out">sample@email.com</i></button>
                         <button type="button" id="loggedOut" data-toggle="dropdown" class="btn btn-outline-primary dropdown-toggle loggedOut" style="display: block">Returning User? <span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right mt-2 text-center">
                             <a href="#" class="nav-item loggedIn"style="display: none">Log out?<i class="fa fa-times-circle ml-2"></i></a>
@@ -41,17 +40,14 @@
                                 <form class="form" role="form">
                                     <div class="form-group">
                                         <label for="emailInput">Enter your email</label>
-                                        <input id="emailInput" placeholder="sample@address.com" class="form-control form-control-sm" type="text" required="">
-                                        <div class="invalid-feedback">
-                                                Please provide a valid zip.
-                                        </div>
+                                        <input data-sent-area="nav" placeholder="sample@address.com" class="form-control form-control-sm" type="email" required>
                                     </div>
                                     <div class="form-group">
-                                        <button type="submit" class="btn btn-primary btn-block">Get Activities List</button>
+                                        <button type="submit" class="btn btn-primary btn-block logWasClicked">Get Activities List</button>
                                     </div>
                                     <div class="form-group text-center">OR</div>
                                     <div class="form-group text-center">
-                                        <li><img id="signIn" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png"  class="my-2 my-sm-0 google-click main"></li>
+                                        <li><img id="signIn" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png"  class="my-2 my-sm-0 google-click"></li>
                                     </div>
                                 </form>
                             </li>
@@ -76,14 +72,14 @@
                                     <input id="actCount" class="form-contorl-plaintext text-center" size="1" value="0" readonly>
                                     <label for="actCount" class="text-right">Selected Activities</label>
                                 </div>
-                                <div id="loggedInShowForecast" class="col-md-5 mt-2 text-right">
+                                <div id="loggedInShowForecast" class="col-md-3 mt-2 text-right">
                                     <div class="form-group">
-                                        <a id="submit-search" href="#"class="btn btn-dark">Show Four Day Forecast</a>
+                                        <a data-sent-area="form" href="#"class="btn btn-dark">Show Four Day Forecast</a>
                                     </div>
                                 </div>
-                                <div class="col-md-2 text-right loggedOut" style="display: none">
+                                <div class="col-md-2 text-right loggedOut" style="display: block">
                                     <div class="form-group">
-                                        <a id="saveList" class="btn btn-primary btn-sm" href="#" data-toggle="modal" data-target="#login-modal"> <i class="fa fa-floppy-o mr-2" aria-hidden="true"></i>Wanna Save?</a>
+                                        <a id="saveList" class="btn btn-primary btn-sm" href="#" > <i class="fa fa-floppy-o mr-2" aria-hidden="true"></i>Wanna Save?</a>
                                     </div>
                                 </div>
                             </div>
@@ -108,87 +104,7 @@
         </div>
 
 
-    <div id="login-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog" role="document">
-            <div class="loginmodal-container">
-                <div class="modal-text">
-                    <button type="button" class="close text-right" data-dismiss="modal" aria-label="Close">
-                        <i class="fa fa-window-close" style="color: red"></i>
-                    </button>
-                </div>  
-                <div class="modal-header">
-                   
-                    <h5 class="modal-title" id="exampleModalLabel">Interested in saving the activities and location selected?</h5>
-                </div>
-                Simply enter your email for next time, or link your Goodgle account<br>
-                <form>
-                    <input type="text" name="email" placeholder="sample@address.com">
-                    <input type="submit" name="login" class="login loginmodal-submit" value="Login">
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="changeInput" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Update Address Input</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Did you wish to modify the current location?
-            </div>
-            <div class="modal-footer">
-                <button id="updateAddConfirm" type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="noActivities" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">No Activities Selected</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Please select an activity from the list and try again.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="noLocation" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">No Location Information Available</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Please enter a new location in the "Conditions around:" box and try again.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
+<!-- failed weather api call modal -->
     <div id="noForecast" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -203,13 +119,14 @@
                     We're sorry for the inconvenience, please try again later.
                 </div>
                 <div class="modal-footer">
-                    Message Number: 492... do these ever mean anything?
+                    <!-- Message Number: 492348 who captures these, really? -->
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
+<!-- loading screen modal while awaiting api return -->
     <div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -226,9 +143,35 @@
             </div>
         </div>
 
+<!-- save modal -->
+  <div class="modal fade" id="login-modal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">No spam just convenience, promise
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+            <form class="form" role="form">
+                <div class="form-group">
+                    <label for="emailInput2">Enter your email address below:</label>
+                    <input id="emailInput2" placeholder="sample@address.com" class="form-control form-control-sm" type="email" required>
+                </div>
+                <div class="form-group">
+                    <button id="save-signIn" type="submit" class="btn btn-primary btn-block logWasClicked">Sign up/Update Previously Saved</button>
+                </div>
+                <div class="form-group text-center">OR</div>
+                <div class="form-group text-center">
+                    <img id="save-signIn" src="./assets/images/signin-assets/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png"  class="my-2 my-sm-0 google-click">
+                </div>
+            </form>
+        </div>
+      </div>
+      
+    </div>
+  </div> 
+
+
     <button id="printUserPref">Go</button>
-    <button id="logintest">Log In</button>
-    <button onclick='$("#noForecast").modal()'>Show Failed Foracast</button>
   
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
@@ -236,6 +179,10 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
+    <script src="https://unpkg.com/sweetalert2@7.7.0/dist/sweetalert2.all.js"></script>
+
+    <!-- Optional: include a polyfill for ES6 Promises for IE11 and Android browser -->
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script>
     <script src="assets/javascript/script.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1vF8yaKPsWrNQPDkPj54ntPtTGoNa1fA&libraries=places&callback=initAutocomplete" async defer></script>
     

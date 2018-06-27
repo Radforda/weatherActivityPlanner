@@ -156,6 +156,7 @@ var cardTime="";
 var cardActivity="";
 var cardNumber=0;
 //this will be called inside the api call or to run after the call is complete and the days have been assigned value
+//this will be called inside the api call or to run after the call is complete and the days have been assigned value
 function checkWeather() {
     
     console.log("check weather is running");
@@ -164,15 +165,15 @@ function checkWeather() {
 
     for (var j = 0; j < forecastDays.length; j++) {
         console.log("j: " + j);
-        console.log(forecastDays[j].number+"  "+currentDay+" "+comparisonDay)
-        if (forecastDays[j].number!=currentDay&&forecastDays[j].time<=21&&forecastDays[j].time>=9){
+        console.log("forcast date: "+forecastDays[j].number+" current day:  "+currentDay+" comparison switch day:"+comparisonDay)
+        if ((forecastDays[j].number!=currentDay)&&(forecastDays[j].time<=21)&&(forecastDays[j].time>=9)){
             if (forecastDays[j].number==comparisonDay){
-                if (forecastDays[j]!=currentDay+1){
+                if (forecastDays[j]!=comparisonDay+1){
                     $("#results").append(card);
                 }
 
                 console.log("creating card");
-                comparisonDay++;
+                comparisonDay=Number(moment(forecastDays[j].rawMoment).add(1, 'days').format("DD"))
                 card=$("<div>").addClass("card").html("");
                 cardHeader=$('<h5>').addClass("card-header").text(forecastDays[j].name);
                 cardBody=$("<div>").addClass("card-body").html("");
@@ -201,6 +202,7 @@ function checkWeather() {
     };
 };
 };
+
 //compare activity properties to day properties to determine if the activity is recomended for that day the console.log it.
 //requires two objects as perameters
 function isItAGoodDay(activity, day) {
@@ -215,28 +217,28 @@ function isItAGoodDay(activity, day) {
             } else { };
         } else {};
     } else {  };
-
 };
+
 //firebase config
 var config = {
-    apiKey: "AIzaSyD63zJ1ZQrlTup42ZS0m1CSEl0k5ZzI8gs",
-    authDomain: "ycis-code-bootca-1529788082604.firebaseapp.com",
-    databaseURL: "https://ycis-code-bootca-1529788082604.firebaseio.com",
-    projectId: "ycis-code-bootca-1529788082604",
-    storageBucket: "ycis-code-bootca-1529788082604.appspot.com",
-    messagingSenderId: "520782676215"
+    apiKey: "AIzaSyDub3ovHdLDIgJYuXAUV_-d-tux3LetDuU",
+    authDomain: "ycis-project-01.firebaseapp.com",
+    databaseURL: "https://ycis-project-01.firebaseio.com",
+    projectId: "ycis-project-01",
+    storageBucket: "ycis-project-01.appspot.com",
+    messagingSenderId: "90816397737"
   };
 firebase.initializeApp(config);
+var database = firebase.database;
 var provider = new firebase.auth.GoogleAuthProvider();
 
 
 //Api call to get array of 
 function getForecast() {
-    alert("wait")
     $("#pleaseWaitDialog").modal("show");
     //api.openweathermap.org/data/2.5/forecast?lat=35&lon=139
     
-    var queryURL = "https://api.openweathermap.org/data/2.5/forecast?lat=" + userPref.geo.lat + "&lon=" + userPref.geo.lng + "&appid=0300e0494f9976a54d845a8f39ccb339";
+    var queryURL = "http://api.openweathermap.org/data/2.5/forecast?zip=" + userPref.zipCode + ",US" + "&appid=0300e0494f9976a54d845a8f39ccb339";
     $.ajax({
         url: queryURL,
         method: "GET"
@@ -276,51 +278,59 @@ function mapForecastObject(data) {
 }
 
 
-
-
-
-
 function getActObjectsFromArr(){
     var arr = [];
     for(var i = 0; i < userPref.activities.length; i++) {
-        arr.push(window[userPref.activities[i]]);
+        for(act in listedActivties){
+            if(listedActivties[act].name == userPref.activities[i]) {
+                arr.push(listedActivties[act]);
+            }
+        }
     }
     return arr;
 }
-function pushPref(googleUser) {
+function pushPref(googleUser,callingElementId) {
     userPref.activities = getActObjectsFromArr();
-    if(typeof googleUser !== "undefined"){
-        userPref.googleId = googleUser.b.b;
+    alert(JSON.stringify(userPref))
+    if(typeof googleUser !== "undefined") {
         userPref.isGoogle = true;
+        userPref.googleId = googleUser.b.b;
         userPref.email = googleUser.email;
     } else {
-        userPref.googleId = "";
         userPref.isGoogle = false;
-        userPref.email = $("#userEmail").val();
-    }
-    firebase.database.ref("/users/").push(user)
-}
-function ifUserExistSetVariable(){
-    if(typeof userPref.email == "undefined" || userPref.email == "" ) {return false}
-    
-    firebase.database.ref.once("users/" + userPref.email, 
-        function(snap){
-            if(typeof snap !== "undefined") {
-                userPref = snap
-                return true;
-            } else {
-                return false;
-            }
+        userPref.googleId = "";
+        if(callingElementId == "save-signIn") {
+            userPref.email = $("#emailInput2").val();
+        } else {
+            userPref.email = $("#emailInput").val();
         }
-    );
+    }
+    
+    database.ref().child('users').push(userPref.email);
 }
-function pullPref() {
-    if(userPref.email = "") {
-        userPref = firebase.database.ref("users/" + userPref.email);
-        return;
-    } 
-    var tempUserPref = firebase.database.ref("")
-    firebase.database.ref("")
+
+function pullPref(googleUser, callingElementId) {
+    if(typeof googleUser !== "undefined") {
+        userPref.isGoogle = true;
+    } else {
+        if(callingElementId == "save-signIn") {
+            userPref.email = $("#emailInput2").val();
+        } else {
+            userPref.email = $("#emailInput").val();
+        }
+    }
+    var tempUser = database.ref.once("/users/" + userPref.email);
+    console.log(tempuser)
+    if(typeof tempUser !== "undefined") {
+        userPref = tempUser;
+    } else {
+        swal({
+            type: 'error',
+            title: 'Oops...',
+            text: "Unable to locate that email on file. Please try a different one or start again."
+        })
+        
+    }
 }
 function checkVisible( elm, evalType ) {
     evalType = evalType || "visible";
@@ -338,10 +348,18 @@ function OutputButtonClick (event) {
     selectedActivityArray = userPref.activities;
     switch (true) {
         case userPref.activities.length == 0:
-            $("#noActivities").modal();
+        swal({
+            type: 'error',
+            title: 'Oops...',
+            text: "There weren't any activities selected, please choose at least one desired activity and try again."
+          })
             break;
         case locSuccess === false:
-            $("#noLocation").modal();
+        swal({
+            type: 'error',
+            title: 'Oops...',
+            text: 'There was no location entered, please add a desired locale and try again.'
+          })
             break;
         default:
             //ui updates to show first load or reset
@@ -349,18 +367,9 @@ function OutputButtonClick (event) {
             //added changes for updated structure
             getForecast();
             //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)   
-            
         }    
 }
-// function locationUpdate(){
-//     if(loadCnt==0){return};
-//     if($(this).val() === initCityState || $(this).val() === "") {
-//         $(this).val("").attr("placeholder","Enter location ...");
-//         // document.getElementById("location").style.zIndex = 0;
-//     } else {
-//         $("#changeInput").modal();
-//     }
-// }
+
 function locLoseFocus(){
     if(locSuccess) {
         if($(this).val() == "") {$(this).val(userPref.city + ", " + userPref.state)};
@@ -372,22 +381,88 @@ function geoLocateClick(event){
 }
 
 function googleSignIn(){
+    alert("you at google?")
+    var noGo = false;
+    if(logInStatus == 0) {
+        switch (true) {
+            case userPref.activities.length == 0:
+                swal({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: "There weren't any activities selected, please choose at least one desired activity and try again."
+                })
+                noGo = true;
+                break;
+            case locSuccess === false:
+                swal({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'There was no location entered, please add a desired locale and try again.'
+                })
+                noGo = true;
+                break;
+        }
+        if(noGo) {return};
+    } else {
+        if(!userPref.isGoogle) {
+            return;
+        } else {
+            //log out of google (code later)
+            logInStatus = 0;
+            return;
+        }
+    }
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    var token = result.credential.accessToken;
+    // The signed-in user info.
+    user = result.user;
+    pullPref(user);
+    }).catch(function(error) {
+        noGo = true;
+        logInFailed();
+        console.log("Google Error: " + error)
+    });
+    if(logInStatus == 0 && noGo == false) {
+        logInStatus = 1;
+        logInStatusDisplayUpdates(userPref.email);
+    }
+}
 
-    // firebase.auth().signInWithPopup(provider).then(function(result) {
-    // // This gives you a Google Access Token. You can use it to access the Google API.
-    // var token = result.credential.accessToken;
-    // // The signed-in user info.
-    // user = result.user;
-    // }).catch(function(error) {
-    //     console.log("Google Error: " + error)
-    // });
+function logInFailed(){
+    logInStatus = 0;
+    swal({
+        type: 'error',
+        title: 'Oops...',
+        text: "Looks like there was an issue with the login process, please try again."
+    })
 }
-function signIn(){
+
+function LogInClick(event){
+    event.preventDefault();
+    var emailEntered ="";
+    if($(this).attr("id") == "save-signIn") {
+        emailEntered = $("#emailInput2").val();
+    } else {
+        emailEntered = $("#emailInput").val();
+    }
+    if(emailEntered == "") {
+        swal({
+            type: 'error',
+            title: 'Oops...',
+            text: "No email entered, please try again."
+        })
+        return;
+    } 
+    var googleUser;
+    alert("you here?")
+    if(logInStatus == 1) {
+        pushPref(googleUser,$(this).attr("id"));
+    } else {
+        pullPref(googleUser,$(this).attr("id"));
+    }
 }
-function confirmUpdateAddressModal(){
-    $("#location").val("").attr("placeholder","Enter location ...")
-    .focus();
-}
+
 function ActivityCheckboxUpdate(){
     var actElArr = $checkboxes.filter(':checked')
     $('#actCount').val(actElArr.length);
@@ -556,14 +631,15 @@ function windowResized(){
         $("#activities .form-check-label").removeClass("mx-3").addClass("mx-1")
     }
 }
-function logInHolder (){
+
+
+function logInStatusDisplayUpdates (email){
     if(logInStatus == 0) {
-        logInStatus = 1;
+        $("#loggedIn").html(email + '<i class="fa fa-user-circle-o fa-2x pl-1" aria-hidden="true">');
         $(".loggedIn").show();
         $(".loggedOut").hide();
         $("#loggedInShowForecast").removeClass("col-md-3").addClass("col-md-5 text-right")
     } else {
-        logInStatus = 0;
         $("#loggedInShowForecast").removeClass("col-md-5 text-class").addClass("col-md-3")
         $(".loggedIn").hide();
         $(".loggedOut").show();
@@ -573,16 +649,20 @@ function logInHolder (){
 $(document).ready(function(){
     loadActivitiesStandard();
     $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
-    $("#signIn").on("click", googleSignIn);
     establishLocation("IP");
     $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     $("#geolocate").click(geoLocateClick);  
-    $("#submit-search").on("click",OutputButtonClick)    
-    $("#updateAddConfirm").click(confirmUpdateAddressModal);
+    $("#submit-search").on("click",OutputButtonClick);
     $(window).resize(windowResized);    
+    $(".google-click").click(googleSignIn);
+    $(".logWasClicked").click(function(event){
+        event.preventDefault();
+        var googleUser
+        pushPref(googleUser,$(this).attr("id"))
+    });
 
+    //temp
     $("#printUserPref").click(function(){
         alert(JSON.stringify(userPref))
     });
-    $("#logintest").click(logInHolder);
 }) 
