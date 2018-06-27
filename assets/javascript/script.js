@@ -1,14 +1,17 @@
 //temporary variables
-var cityName = "Richmond";
-var zipCode = "";
-var countryCode = "US";
 var forecastDays = [];
 var userPref = {
-    activites: [],
-    uniqueID: "",
+    activities: [],
+    googleId: "",
     isGoogle: false,
     email: "",
-    zipCode: ""
+    city: "",
+    state: "",
+    zipCode: "",
+    geo: {
+        lat: "",
+        lng: ""
+    }
 };
 
 var statesByAbb = {
@@ -73,7 +76,8 @@ var statesByAbb = {
     "WY": "Wyoming"
     };
 var stateByName = swap(statesByAbb);
-var activities, autocomplete, locObj, $checkboxes, initCityState
+var activities, autocomplete, $checkboxes, initCityState, locSuccess
+var logInStatus = 0;
 var loadCnt = 0;
 var componentForm = {
     street_number: 'short_name',
@@ -85,48 +89,6 @@ var componentForm = {
 };
 var displayDays=[]
 
-//function to map API response object to application object
-function mapForecastObject(data) {
-    data.list.forEach(element => {
-        var day = {
-            date: moment(element.dt_txt).format('LLL'),
-            number:Number(moment(element.dt_txt).format("DD")),
-            name: moment(element.dt_txt).format('dddd'),
-            time:Number(moment(element.dt_txt).format("HH")),
-            displayTime:(moment(element.dt_txt).format("LT")),
-            tempMax: (parseFloat(element.main.temp_max - 273.15) * 1.8) + 32,/*Converting temp from Kelvin to Farenheit*/
-            tempMin: (parseFloat(element.main.temp_max - 273.15) * 1.8) + 32,/*Converting temp from Kelvin to Farenheit*/
-            windMin: element.wind.speed,
-            skyCondition: element.weather[0].description,
-        };
-
-        forecastDays.push(day);
-    });
-    console.log(forecastDays);
-}
-
-//Api call to get array of 
-function getForecast() {
-    if (zipCode === "") {
-        var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "," + countryCode + "&appid=0300e0494f9976a54d845a8f39ccb339";
-        console.log(zipCode +" "+ cityName);
-    }
-    else {
-        var queryURL = "https://api.openweathermap.org/data/2.5/forecast?zip=" + zipCode + "," + countryCode + "&appid=0300e0494f9976a54d845a8f39ccb339";
-    }
-    $.ajax({
-        url: queryURL,
-        method: "GET"
-    }).then(function (response) {
-        console.log(response);
-        //Calling function to map larger object to usable object
-        mapForecastObject(response);
-    });
-}
-
-
-
-getForecast();
 // getForecast();
 // all units should be in F mph 
 
@@ -183,23 +145,16 @@ var day2 = {
     precip: 'none'
 };
 
-
-
 var listedActivties = [Cycling, Running, Golfing]
 var selectedActivityArray = [];
 var dayArray = [day1, day2];
 var displayDay=[];
 var currentDay=Number(moment().format("DD"));
-console.log("currentDay"+currentDay);
 comparisonDay=currentDay+1;
 var card="";
 var cardTime="";
 var cardActivity="";
-
 var cardNumber=0;
-
-//functions
-
 //this will be called inside the api call or to run after the call is complete and the days have been assigned value
 function checkWeather() {
     
@@ -246,7 +201,6 @@ function checkWeather() {
     };
 };
 };
-
 //compare activity properties to day properties to determine if the activity is recomended for that day the console.log it.
 //requires two objects as perameters
 function isItAGoodDay(activity, day) {
@@ -263,41 +217,89 @@ function isItAGoodDay(activity, day) {
     } else {  };
 
 };
-
-
 //firebase config
 var config = {
-    apiKey: "AIzaSyAnIrJKU0DegRK-R7CqlNd84wrrdqmg7Xg",
-    authDomain: "practice-a6d1d.firebaseapp.com",
-    databaseURL: "https://practice-a6d1d.firebaseio.com",
-    projectId: "practice-a6d1d",
-    storageBucket: "practice-a6d1d.appspot.com",
-    messagingSenderId: "487061189656"
-};
+    apiKey: "AIzaSyD63zJ1ZQrlTup42ZS0m1CSEl0k5ZzI8gs",
+    authDomain: "ycis-code-bootca-1529788082604.firebaseapp.com",
+    databaseURL: "https://ycis-code-bootca-1529788082604.firebaseio.com",
+    projectId: "ycis-code-bootca-1529788082604",
+    storageBucket: "ycis-code-bootca-1529788082604.appspot.com",
+    messagingSenderId: "520782676215"
+  };
 firebase.initializeApp(config);
 var provider = new firebase.auth.GoogleAuthProvider();
-  
+
+
+//Api call to get array of 
+function getForecast() {
+    alert("wait")
+    $("#pleaseWaitDialog").modal("show");
+    //api.openweathermap.org/data/2.5/forecast?lat=35&lon=139
+    
+    var queryURL = "https://api.openweathermap.org/data/2.5/forecast?lat=" + userPref.geo.lat + "&lon=" + userPref.geo.lng + "&appid=0300e0494f9976a54d845a8f39ccb339";
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+    }).then(
+        function (response) {
+            console.log(response);
+            //Calling function to map larger object to usable object
+            mapForecastObject(response);
+            checkWeather();
+            $("#pleaseWaitDialog").modal("hide");
+        }
+    ).fail(
+        function(){
+            $("#pleaseWaitDialog").modal("hide");
+            $("#noForecast").modal();
+        }
+    );
+}
+
+//function to map API response object to application object
+function mapForecastObject(data) {
+    data.list.forEach(element => {
+        var day = {
+            date: moment(element.dt_txt).format('LLL'),
+            number:Number(moment(element.dt_txt).format("DD")),
+            name: moment(element.dt_txt).format('dddd'),
+            time:Number(moment(element.dt_txt).format("HH")),
+            displayTime:(moment(element.dt_txt).format("LT")),
+            tempMax: (parseFloat(element.main.temp_max - 273.15) * 1.8) + 32,/*Converting temp from Kelvin to Farenheit*/
+            tempMin: (parseFloat(element.main.temp_max - 273.15) * 1.8) + 32,/*Converting temp from Kelvin to Farenheit*/
+            windMin: element.wind.speed,
+            skyCondition: element.weather[0].description,
+        };
+        forecastDays.push(day);
+    });
+    console.log(forecastDays);
+}
+
+
+
+
+
+
 function getActObjectsFromArr(){
     var arr = [];
-    for(var i = 0; i < activities.length; i++) {
-        arr.push(window[activities[i]]);
+    for(var i = 0; i < userPref.activities.length; i++) {
+        arr.push(window[userPref.activities[i]]);
     }
     return arr;
 }
-
 function pushPref(googleUser) {
-    userPref.activites = getActObjectsFromArr();
-    userPref.zipCode = locObj.zip;
+    userPref.activities = getActObjectsFromArr();
     if(typeof googleUser !== "undefined"){
-        userPref.uniqueID = googleUser["string for google user id"];
-        userPref.email = googleUser["string for user from google docs"]
+        userPref.googleId = googleUser.b.b;
         userPref.isGoogle = true;
+        userPref.email = googleUser.email;
     } else {
+        userPref.googleId = "";
+        userPref.isGoogle = false;
         userPref.email = $("#userEmail").val();
     }
-    firebase.database.ref("users/").push(user)
+    firebase.database.ref("/users/").push(user)
 }
-
 function ifUserExistSetVariable(){
     if(typeof userPref.email == "undefined" || userPref.email == "" ) {return false}
     
@@ -312,8 +314,6 @@ function ifUserExistSetVariable(){
         }
     );
 }
-
-
 function pullPref() {
     if(userPref.email = "") {
         userPref = firebase.database.ref("users/" + userPref.email);
@@ -322,7 +322,6 @@ function pullPref() {
     var tempUserPref = firebase.database.ref("")
     firebase.database.ref("")
 }
-
 function checkVisible( elm, evalType ) {
     evalType = evalType || "visible";
 
@@ -334,252 +333,256 @@ function checkVisible( elm, evalType ) {
     if (evalType === "visible") return ((y < (vpH + st)) && (y > (st - elementHeight)));
     if (evalType === "above") return ((y < (vpH + st)));
 }
-
-
-
 function OutputButtonClick (event) {
     event.preventDefault();
-    console.log(activities)
-    selectedActivityArray = activities;
-    if(typeof selectedActivityArray == "undefined" ||selectedActivityArray.length == 0) {
-        $("#noActivities").modal();
-        return
-    }
-        //ui updates to show first load or reset
-        $("#weather-results").show();
-        //added changes for updated structure
-        zipCode = locObj.zip
-        getForecast();
-        //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)
-        
-        checkWeather();
-    $(window).resize(function(){setNavFeaturesWidth()});
+    selectedActivityArray = userPref.activities;
+    switch (true) {
+        case userPref.activities.length == 0:
+            $("#noActivities").modal();
+            break;
+        case locSuccess === false:
+            $("#noLocation").modal();
+            break;
+        default:
+            //ui updates to show first load or reset
+            $("#weather-results").show();
+            //added changes for updated structure
+            getForecast();
+            //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)   
+            
+        }    
 }
-
-function locationUpdate(){
-    if(loadCnt==0){return};
-    console.log("current: " + $(this).val() +" Init: " + initCityState)
-    if($(this).val() === initCityState || $(this).val() === "") {
-        $(this).val("").attr("placeholder","Enter location ...");
-        // document.getElementById("location").style.zIndex = 0;
-    } else {
-        $("#changeInput").modal();
-    }
-}
+// function locationUpdate(){
+//     if(loadCnt==0){return};
+//     if($(this).val() === initCityState || $(this).val() === "") {
+//         $(this).val("").attr("placeholder","Enter location ...");
+//         // document.getElementById("location").style.zIndex = 0;
+//     } else {
+//         $("#changeInput").modal();
+//     }
+// }
 function locLoseFocus(){
-    if($(this).val() == "") {$(this).val(locObj.cityState)};
-    setNavFeaturesWidth();
-    // $(this).attr('size', $(this).val().length)
+    if(locSuccess) {
+        if($(this).val() == "") {$(this).val(userPref.city + ", " + userPref.state)};
+    }
 }
-
-function loadGeoLocate(event){
+function geoLocateClick(event){
     event.preventDefault();
     establishLocation("click");
 }
 
+function googleSignIn(){
 
-function signInProcedure(){
-    //Google Sign in
-    console.log("sign in clicked")
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-    // This gives you a Google Access Token. You can use it to access the Google API.
-    var token = result.credential.accessToken;
-    // The signed-in user info.
-    user = result.user;
-    //check if save modal is vsible to determine if load or pull
-    if(checkVisible($("#saveModal","visible")) == true) {
-      pushPref(user);
-    } else {
-      pullPref();
-    }
-    // ...
-    }).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
-    });
+    // firebase.auth().signInWithPopup(provider).then(function(result) {
+    // // This gives you a Google Access Token. You can use it to access the Google API.
+    // var token = result.credential.accessToken;
+    // // The signed-in user info.
+    // user = result.user;
+    // }).catch(function(error) {
+    //     console.log("Google Error: " + error)
+    // });
 }
-
+function signIn(){
+}
 function confirmUpdateAddressModal(){
     $("#location").val("").attr("placeholder","Enter location ...")
     .focus();
 }
-
 function ActivityCheckboxUpdate(){
-    var showButton = $("#submit-search");
     var actElArr = $checkboxes.filter(':checked')
     $('#actCount').val(actElArr.length);
     if(actElArr.length > 0) {
-        showButton.removeClass("disabled");
-        activities = actElArr.map(function(){return $(this).val()}).get(); //converts element array to value array
+        var strArr = actElArr.map(function(){return $(this).val()}).get()//converts element array to value array
+        userPref.activities = strArr
     } else {
-        showButton.addClass("disabled")
-        activities = [];
+        userPref.activities = [];
     }
 }
-
-$(document).ready(function(){
-    $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
-    $(".signIn").on("click", signInProcedure);
-    establishLocation("IP");
-    loadActivitiesStandard();
-    $("#location").focus(locationUpdate);
-    $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-    $("#geolocate").click(loadGeoLocate);
-    $("#submit-search").on("click",OutputButtonClick)    
-    $("#updateAddConfirm").click(confirmUpdateAddressModal);
-}) 
-
-
-//Daniel Code
 function swap(json) {
     var ret = {};
     for(var key in json){ret[json[key]] = key};
     return ret;
 }
-function loadActivitiesStandard() {
-var actForm = $("#activities");
-    $("#activities-list").show();
-    actForm.empty();
+function loadActivitiesStandard() {;
     for(var i = 0; i < listedActivties.length; i++) {
         var activityNameStr = listedActivties[i].name;
-        var labelHTML = '<input ' + 'class="form-check-input activity mb-2" ' + 'type="checkbox" '+ 
-            + 'id="act-' + activityNameStr + '" ' + 'value="' + activityNameStr + '"><h6>' + activityNameStr + '</h6></input>'        
+        var divFormGroup = $('<div class="form-check form-check-inline">');        
         var newLabel = $("<label>")
-            .addClass("form-check-label mx-1")
+            .addClass("form-check-label ml-1")
             .attr("for","act-" + activityNameStr)
-            .html(labelHTML);
-        actForm.append(newLabel);
-        // $("#act-" + activityNameStr).text(activityNameStr)
+            .html('<span style="font-size:18px">' + activityNameStr + '</span>');
+        var checkbox = $('<input ' + 'class="form-check-input activity m-2" ' + 'type="checkbox" '+ 
+            + 'id="act-' + activityNameStr + '" ' + 'value="' + activityNameStr + '">')
+        divFormGroup.append(checkbox);
+        divFormGroup.append(newLabel);
+        $("#activities").append(divFormGroup);
     }
 }
-function Location(lat,lng,zip,city,state,cityState,source){
-    this.lat = lat;
-    this.lng = lng;
-    this.zip = zip;
-    this.city = city;
-    this.state = state;
-    this.cityState = cityState;
-    this.source = source;
-}
+
 function initAutocomplete() {
     autocomplete = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('location')),
             {types: ['geocode']}
         );
     autocomplete.addListener('place_changed', function(){
-            console.log("did you clear it?")
-            fillFromPlace(autocomplete.getPlace());
-            setNavFeaturesWidth();
-            // $("#location").attr('size', $("#location").val().length)
-            locObj.source = "form";
+            var place = autocomplete.getPlace();
+            establishLocation("place",place);
         });
 }
-function fillFromLatLng(){
-    $("#location-loading").show();
-    $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + locObj.lat + "," + locObj.lng).done (
-        function(address) {
-            console.log(address)
-            $("#location-loading").hide();
-            $("#location").val(address.results[0].formatted_address);
-            setNavFeaturesWidth();
-            // $("#location").attr('size', $("#location").val().length)
-            fillFromPlace(address.results[0])
-        }
-    )
-}
-function fillFromPlace(place) {
-    var componentForm = {
-        street_number: 'short_name',
-        route: 'long_name',
-        locality: 'long_name',
-        administrative_area_level_1: 'short_name',
-        country: 'long_name',
-        postal_code: 'short_name'
-    };
 
-    for (var i = 0; i < place.address_components.length; i++) {
-        var addressType = place.address_components[i].types[0];
-        if (componentForm[addressType]) {
-            var val = place.address_components[i][componentForm[addressType]];
-            switch (addressType) {
-                case "locality":
-                    locObj.city = val;
-                    break;
-                case "administrative_area_level_1":
-                    locObj.state = val;
-                    break;
-                case "postal_code":
-                    locObj.zip = val
-                    break;
-            }
-            // document.getElementById(addressType).value = val;
-        }
-    }
-    locObj.cityState = locObj.city + ", " + locObj.state;
-    console.log(locObj);
+function latLngSuccess(address){
+    var place = address.results[0];
+    $("#location").val(place.formatted_address);
+    establishLocation("place",place);
+    locSuccess = true;
+    didWeGetALocation()
 }
-function establishLocation(source) {
-    loadCnt++;
+
+function latLngFail(error){
+    console.log(error);
+    locSuccess = false;
+    didWeGetALocation(true);
+}
+function latLngAddress(){
     $("#location-loading").show();
+    $.getJSON('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + userPref.geo.lat + "," + userPref.geo.lng
+    ).done (
+        latLngSuccess
+    ).fail(
+        latLngFail
+    );
+    
+}
+function geoipDBSuccuess(results){
+    locSuccess = true;
+    userPref.geo.lat = results.latitude;
+    userPref.geo.lng = results.longitude;
+    userPref.zipCode = results.postal;
+    userPref.city = results.city;
+    userPref.state = results.state;
+    $("#location").val(userPref.city + ", " + userPref.state);
+    locSuccess = true;
+    didWeGetALocation();
+}
+function establishLocation(source, place) {
+    loadCnt++;
+    if(source !== "place") {$("#location-loading").show()};
     if(source === "IP") {
-        $.getJSON('https://geoip-db.com/json/').done(
-            function(results) {
-                locObj = new Location(
-                    results.latitude,
-                    results.longitude,
-                    results.postal,
-                    results.city,
-                    results.state,
-                    results.city + ", " + stateByName[results.state],"IP")
-                if(loadCnt == 1) {
-                    initCityState = locObj.cityState;
-                };
-                $("#location").val(locObj.cityState);
-                $("#location-loading").hide();
-                setNavFeaturesWidth();
-                // $("#location").attr('size', $("#location").val().length)
-            }
-        );
+        $.getJSON('https://geoip-db.com/json/')
+        .done(geoipDBSuccuess)
+        .fail(function(){
+            locSuccess = false
+            console.log("failed to get geo-ip coords")
+        });
     } else if (source === "click") {
         if (navigator.geolocation) {
+            var startingVal = $("#location").val()
             navigator.geolocation.getCurrentPosition(
                 function(position) {
-                    var loc = {"lat": position.coords.latitude, "lng": position.coords.longitude}
-                    var circle = new google.maps.Circle({center: loc, radius: position.coords.accuracy});
+                    userPref.geo.lat = position.coords.latitude;
+                    userPref.geo.lng = position.coords.longitude;
+                    var circleObj = {
+                        center: userPref.geo,
+                        radius: position.coords.accuracy
+                    }
+                    var circle = new google.maps.Circle(circleObj);
                     autocomplete.setBounds(circle.getBounds());
-                    locObj.lat = position.coords.latitude;
-                    locObj.lng = position.coords.longitude;
-                    fillFromLatLng();
-                    locObj.source = "click"
-
-                    console.log("position")
-                    console.log(position)
+                    latLngAddress();// locSuccess Set after googleapi 
                 },
                 function() {
-                    //do nothing on declination
+                    if(startingVal == "" || startingVal !== $("#location").val()) {
+                        locSuccess = false;
+                    }                        
                 });
         }
+    } else if (source === "place") { 
+        if (typeof place === "undefined"){
+            locSuccess = false;
+            console.log("establishLocation called with 'place' as source && no place variable sent")
+        } else {
+            locSuccess = true;
+            var componentForm = {
+                street_number: 'short_name',
+                route: 'long_name',
+                locality: 'long_name',
+                administrative_area_level_1: 'short_name',
+                country: 'long_name',
+                postal_code: 'short_name'
+            };
+        
+            for (var i = 0; i < place.address_components.length; i++) {
+                var addressType = place.address_components[i].types[0];
+                if (componentForm[addressType]) {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    switch (addressType) {
+                        case "locality":
+                            userPref.city = val;
+                            break;
+                        case "administrative_area_level_1":
+                            userPref.state = val;
+                            break;
+                        case "postal_code":
+                            userPref.zipCode = val
+                            break;
+                    }
+                }
+            }
+        }
     } else {
-        alert("called establish with no value")
+        locSuccess = false;
+        console.log("error getting location data::function(source) = " + source);
+    }
+    didWeGetALocation()
+}
+
+function didWeGetALocation(geoOnly){
+    $("#location-loading").hide();
+    if(locSuccess === false) {
+        userPref.city = "";
+        userPref.state = "";
+        userPref.zipCode = "";
+        if(geoOnly !== true) {
+            userPref.geo.lng = "";
+            userPref.geo.lat = "";
+        }
+    } else {
+        if(typeof initCityState == "undefined") {initCityState = userPref.city + ", " + userPref.state};
     }
 }
-function setNavFeaturesWidth(){
-    var locInputBox = $("#location");
+function windowResized(){
     if($(window).width() <= 800) {
-        // locInputBox.attr('size',"30")
         $("#activities .form-check-label").removeClass("mx-1").addClass("mx-3")
-        // locInputBox.removeClass("form-control-inline");
-        // locInputBox.addClass("form-control");
     } else {
-        // locInputBox.attr('size', "30");
         $("#activities .form-check-label").removeClass("mx-3").addClass("mx-1")
-        // locInputBox.removeClass("form-control");
-        // locInputBox.addClass("form-control-inline");
     }
 }
+function logInHolder (){
+    if(logInStatus == 0) {
+        logInStatus = 1;
+        $(".loggedIn").show();
+        $(".loggedOut").hide();
+        $("#loggedInShowForecast").removeClass("col-md-3").addClass("col-md-5 text-right")
+    } else {
+        logInStatus = 0;
+        $("#loggedInShowForecast").removeClass("col-md-5 text-class").addClass("col-md-3")
+        $(".loggedIn").hide();
+        $(".loggedOut").show();
+    }
+}
+
+$(document).ready(function(){
+    loadActivitiesStandard();
+    $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
+    $("#signIn").on("click", googleSignIn);
+    establishLocation("IP");
+    $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    $("#geolocate").click(geoLocateClick);  
+    $("#submit-search").on("click",OutputButtonClick)    
+    $("#updateAddConfirm").click(confirmUpdateAddressModal);
+    $(window).resize(windowResized);    
+
+    $("#printUserPref").click(function(){
+        alert(JSON.stringify(userPref))
+    });
+    $("#logintest").click(logInHolder);
+}) 
