@@ -292,13 +292,15 @@ function checkWeather() {
 function isItAGoodDay(activity, day) {
     console.log("checking if " + day.date + " is a good day for " + activity.name + ".");
     if (activity.tempMax > day.tempMax && activity.tempMin < day.tempMin) {
+        console.log("temp is good");
         if (activity.windMax > day.windMin && activity.windMin < day.windMin) {
+            console.log("wind is good")
             if (activity.skyCondition.indexOf(day.skyCondition) <= 0) {
                 cardTime.append("<p>"+activity.name+"</p>");
                 console.log(activity.name + " is recommended for " + day.name);
-            } else { };
-        } else {};
-    } else {  };
+            } ;
+        };
+    };
 
 };
 
@@ -449,6 +451,7 @@ function confirmUpdateAddressModal(){
 }
 
 function ActivityCheckboxUpdate(){
+    
     var showButton = $("#submit-search");
     var actElArr = $checkboxes.filter(':checked')
     $('#actCount').val(actElArr.length);
@@ -462,10 +465,10 @@ function ActivityCheckboxUpdate(){
 }
 
 $(document).ready(function(){
-    $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
-    $(".signIn").on("click", signInProcedure);
-    establishLocation("IP");
     loadActivitiesStandard();
+    $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
+    $("#signIn").on("click", signInProcedure);
+    establishLocation("IP");
     $("#location").focus(locationUpdate);
     $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     $("#geolocate").click(loadGeoLocate);
