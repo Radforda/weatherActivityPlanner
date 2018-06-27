@@ -218,10 +218,8 @@ function isItAGoodDay(activity, day) {
     if (activity.tempMax > day.tempMax && activity.tempMin < day.tempMin) {
         if (activity.windMax > day.windMin && activity.windMin < day.windMin) {
             if (activity.skyCondition.indexOf(day.skyCondition) <= 0) {
-                if (activity.precip.indexOf(day.precip) <= 0) {
-                    cardTime.append("<p>"+activity.name+"</p>");
-                    console.log(activity.name + " is recommended for " + day.name);
-                } else { };
+                cardTime.append("<p>"+activity.name+"</p>");
+                console.log(activity.name + " is recommended for " + day.name);
             } else { };
         } else {};
     } else {  };
