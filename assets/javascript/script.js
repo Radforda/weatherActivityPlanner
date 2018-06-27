@@ -292,16 +292,15 @@ function checkWeather() {
 function isItAGoodDay(activity, day) {
     console.log("checking if " + day.date + " is a good day for " + activity.name + ".");
     if (activity.tempMax > day.tempMax && activity.tempMin < day.tempMin) {
-        console.log("temp is good");
         if (activity.windMax > day.windMin && activity.windMin < day.windMin) {
-            console.log("wind is good")
             if (activity.skyCondition.indexOf(day.skyCondition) <= 0) {
-                cardTime.append("<p>"+activity.name+"</p>");
-                console.log(activity.name + " is recommended for " + day.name);
-            } ;
-        };
-    };
-
+                if (activity.precip.indexOf(day.precip) <= 0) {
+                    cardTime.append("<p>"+activity.name+"</p>");
+                    console.log(activity.name + " is recommended for " + day.name);
+                } else { };
+            } else { };
+        } else {};
+    } else {  };
 };
 
 
