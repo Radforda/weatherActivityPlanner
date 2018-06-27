@@ -499,7 +499,6 @@ function initAutocomplete() {
             {types: ['geocode']}
         );
     autocomplete.addListener('place_changed', function(){
-            console.log("did you clear it?")
             fillFromPlace(autocomplete.getPlace());
             setNavFeaturesWidth();
             // $("#location").attr('size', $("#location").val().length)
