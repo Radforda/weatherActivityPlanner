@@ -508,7 +508,7 @@ function initAutocomplete() {
 }
 function fillFromLatLng(){
     $("#location-loading").show();
-    $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + locObj.lat + "," + locObj.lng).done (
+    $.getJSON('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + locObj.lat + "," + locObj.lng).done (
         function(address) {
             console.log(address)
             $("#location-loading").hide();
