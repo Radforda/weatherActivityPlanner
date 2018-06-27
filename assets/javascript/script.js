@@ -3,7 +3,86 @@ var cityName = "Richmond";
 var zipCode = "";
 var countryCode = "US";
 var forecastDays = [];
+var userPref = {
+    activites: [],
+    uniqueID: "",
+    isGoogle: false,
+    email: "",
+    zipCode: ""
+};
 
+var statesByAbb = {
+    "AL": "Alabama",
+    "AK": "Alaska",
+    "AS": "American Samoa",
+    "AZ": "Arizona",
+    "AR": "Arkansas",
+    "CA": "California",
+    "CO": "Colorado",
+    "CT": "Connecticut",
+    "DE": "Delaware",
+    "DC": "District Of Columbia",
+    "FM": "Federated States Of Micronesia",
+    "FL": "Florida",
+    "GA": "Georgia",
+    "GU": "Guam",
+    "HI": "Hawaii",
+    "ID": "Idaho",
+    "IL": "Illinois",
+    "IN": "Indiana",
+    "IA": "Iowa",
+    "KS": "Kansas",
+    "KY": "Kentucky",
+    "LA": "Louisiana",
+    "ME": "Maine",
+    "MH": "Marshall Islands",
+    "MD": "Maryland",
+    "MA": "Massachusetts",
+    "MI": "Michigan",
+    "MN": "Minnesota",
+    "MS": "Mississippi",
+    "MO": "Missouri",
+    "MT": "Montana",
+    "NE": "Nebraska",
+    "NV": "Nevada",
+    "NH": "New Hampshire",
+    "NJ": "New Jersey",
+    "NM": "New Mexico",
+    "NY": "New York",
+    "NC": "North Carolina",
+    "ND": "North Dakota",
+    "MP": "Northern Mariana Islands",
+    "OH": "Ohio",
+    "OK": "Oklahoma",
+    "OR": "Oregon",
+    "PW": "Palau",
+    "PA": "Pennsylvania",
+    "PR": "Puerto Rico",
+    "RI": "Rhode Island",
+    "SC": "South Carolina",
+    "SD": "South Dakota",
+    "TN": "Tennessee",
+    "TX": "Texas",
+    "UT": "Utah",
+    "VT": "Vermont",
+    "VI": "Virgin Islands",
+    "VA": "Virginia",
+    "WA": "Washington",
+    "WV": "West Virginia",
+    "WI": "Wisconsin",
+    "WY": "Wyoming"
+    };
+var stateByName = swap(statesByAbb);
+var activities, autocomplete, locObj, $checkboxes, initCityState
+var loadCnt = 0;
+var componentForm = {
+    street_number: 'short_name',
+    route: 'long_name',
+    locality: 'long_name',
+    administrative_area_level_1: 'short_name',
+    country: 'long_name',
+    postal_code: 'short_name'
+};
 var displayDays=[]
 
 //function to map API response object to application object
@@ -52,7 +131,6 @@ getForecast();
 // all units should be in F mph 
 
 //variables
-console.log("Javascript file was loaded")
 var Running = {
     name: "Running",
     tempMax: 85,
@@ -160,8 +238,6 @@ var cardActivity="";
 
 var cardNumber=0;
 
-
-
 //functions
 
 //this will be called inside the api call or to run after the call is complete and the days have been assigned value
@@ -239,15 +315,121 @@ var config = {
 firebase.initializeApp(config);
 var provider = new firebase.auth.GoogleAuthProvider();
   
-  //Google Sign in
- $(".signIn").on("click", function(){
+function getActObjectsFromArr(){
+    var arr = [];
+    for(var i = 0; i < activities.length; i++) {
+        arr.push(window[activities[i]]);
+    }
+    return arr;
+}
+
+function pushPref(googleUser) {
+    userPref.activites = getActObjectsFromArr();
+    userPref.zipCode = locObj.zip;
+    if(typeof googleUser !== "undefined"){
+        userPref.uniqueID = googleUser["string for google user id"];
+        userPref.email = googleUser["string for user from google docs"]
+        userPref.isGoogle = true;
+    } else {
+        userPref.email = $("#userEmail").val();
+    }
+    firebase.database.ref("users/").push(user)
+}
+
+function ifUserExistSetVariable(){
+    if(typeof userPref.email == "undefined" || userPref.email == "" ) {return false}
+    
+    firebase.database.ref.once("users/" + userPref.email, 
+        function(snap){
+            if(typeof snap !== "undefined") {
+                userPref = snap
+                return true;
+            } else {
+                return false;
+            }
+        }
+    );
+}
+
+
+function pullPref() {
+    if(userPref.email = "") {
+        userPref = firebase.database.ref("users/" + userPref.email);
+        return;
+    } 
+    var tempUserPref = firebase.database.ref("")
+    firebase.database.ref("")
+}
+
+function checkVisible( elm, evalType ) {
+    evalType = evalType || "visible";
+
+    var vpH = $(window).height(), // Viewport Height
+        st = $(window).scrollTop(), // Scroll Top
+        y = $(elm).offset().top,
+        elementHeight = $(elm).height();
+
+    if (evalType === "visible") return ((y < (vpH + st)) && (y > (st - elementHeight)));
+    if (evalType === "above") return ((y < (vpH + st)));
+}
+
+
+
+function OutputButtonClick (event) {
+    event.preventDefault();
+    console.log(activities)
+    selectedActivityArray = activities;
+    if(typeof selectedActivityArray == "undefined" ||selectedActivityArray.length == 0) {
+        $("#noActivities").modal();
+        return
+    }
+        //ui updates to show first load or reset
+        $("#weather-results").show();
+        //added changes for updated structure
+        zipCode = locObj.zip
+        getForecast();
+        //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)
+        
+        checkWeather();
+    $(window).resize(function(){setNavFeaturesWidth()});
+}
+
+function locationUpdate(){
+    if(loadCnt==0){return};
+    console.log("current: " + $(this).val() +" Init: " + initCityState)
+    if($(this).val() === initCityState || $(this).val() === "") {
+        $(this).val("").attr("placeholder","Enter location ...");
+        // document.getElementById("location").style.zIndex = 0;
+    } else {
+        $("#changeInput").modal();
+    }
+}
+function locLoseFocus(){
+    if($(this).val() == "") {$(this).val(locObj.cityState)};
+    setNavFeaturesWidth();
+    // $(this).attr('size', $(this).val().length)
+}
+
+function loadGeoLocate(event){
+    event.preventDefault();
+    establishLocation("click");
+}
+
+
+function signInProcedure(){
+    //Google Sign in
     console.log("sign in clicked")
     firebase.auth().signInWithPopup(provider).then(function(result) {
     // This gives you a Google Access Token. You can use it to access the Google API.
     var token = result.credential.accessToken;
     // The signed-in user info.
-    var user = result.user;
-    console.log("user object:"+user);
+    user = result.user;
+    //check if save modal is vsible to determine if load or pull
+    if(checkVisible($("#saveModal","visible")) == true) {
+      pushPref(user);
+    } else {
+      pullPref();
+    }
     // ...
     }).catch(function(error) {
         // Handle Errors here.
@@ -259,160 +441,47 @@ var provider = new firebase.auth.GoogleAuthProvider();
         var credential = error.credential;
         // ...
     });
-});
+}
+
+function confirmUpdateAddressModal(){
+    $("#location").val("").attr("placeholder","Enter location ...")
+    .focus();
+}
+
+function ActivityCheckboxUpdate(){
+    var showButton = $("#submit-search");
+    var actElArr = $checkboxes.filter(':checked')
+    $('#actCount').val(actElArr.length);
+    if(actElArr.length > 0) {
+        showButton.removeClass("disabled");
+        activities = actElArr.map(function(){return $(this).val()}).get(); //converts element array to value array
+    } else {
+        showButton.addClass("disabled")
+        activities = [];
+    }
+}
 
 $(document).ready(function(){
+    $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
+    $(".signIn").on("click", signInProcedure);
     establishLocation("IP");
     loadActivitiesStandard();
-    $("#location").focus(function(){
-        console.log("current: " + $(this).val() +" Init: " + initCityState)
-        if($(this).val() === initCityState || $(this).val() === "") {
-            $(this).val("").attr("placeholder","Enter location ...");
-            // document.getElementById("location").style.zIndex = 0;
-        } else {
-            $("#changeInput").modal();
-        }
-    });
+    $("#location").focus(locationUpdate);
+    $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    $("#geolocate").click(loadGeoLocate);
+    $("#submit-search").on("click",OutputButtonClick)    
+    $("#updateAddConfirm").click(confirmUpdateAddressModal);
+}) 
 
-    $("#location").focusout(function(){
-        if($(this).val() == "") {$(this).val(locObj.cityState)};
-        setNavFeaturesWidth();
-        // $(this).attr('size', $(this).val().length)
-    });
-
-    $("#geolocate").on("click",function(event) {
-        event.preventDefault();
-        establishLocation("click");
-    });
-
-    $("#submit-search").on("click",function(event) {
-        event.preventDefault();
-        if($("#submit-search").text() == "Go") {
-            //ui updates to show first load or reset
-            $("#welcome-msg").hide();
-            $("#weather-results").show();
-            $("#activities-list").hide();
-            $("#submit-search").text("Reset");
-            
-            //added changes for updated structure
-            zipCode = locObj.zip
-            getForecast();
-            //updated activities array to be string array top level (Vu was causing conflicts with bootstrap - known bugs around check boxes disappearing on mobile)
-            selectedActivityArray = activities;
-            checkWeather();
-        } else {
-            $("#weather-results").hide();
-            $("#activities-list").show();
-            $("#submit-search").text("Go");
-        }
-
-        $(window).resize(function(){setNavFeaturesWidth()});
-    });
-    
-    $("#updateAddConfirm").click(function(){
-        $("#location").val("").attr("placeholder","Enter location ...")
-        .focus();
-    });
-    $checkboxes = $('#activities input[type="checkbox"]');
-    $('#activities input[type="checkbox"]').change(        
-        function (){
-            var searchButton = $("#submit-search");
-            var actElArr = $checkboxes.filter(':checked')
-            $('#activitiesCnt').text(actElArr.length);
-            if(actElArr.length > 0) {
-                searchButton.removeClass("disabled");
-                activities = actElArr.map(function(){return $(this).val()}).get();
-            } else {
-                searchButton.addClass("disabled")
-                activities = [];
-            }
-        }
-    );
-})
 
 //Daniel Code
-//variables
-var statesByAbb = {
-    "AL": "Alabama",
-    "AK": "Alaska",
-    "AS": "American Samoa",
-    "AZ": "Arizona",
-    "AR": "Arkansas",
-    "CA": "California",
-    "CO": "Colorado",
-    "CT": "Connecticut",
-    "DE": "Delaware",
-    "DC": "District Of Columbia",
-    "FM": "Federated States Of Micronesia",
-    "FL": "Florida",
-    "GA": "Georgia",
-    "GU": "Guam",
-    "HI": "Hawaii",
-    "ID": "Idaho",
-    "IL": "Illinois",
-    "IN": "Indiana",
-    "IA": "Iowa",
-    "KS": "Kansas",
-    "KY": "Kentucky",
-    "LA": "Louisiana",
-    "ME": "Maine",
-    "MH": "Marshall Islands",
-    "MD": "Maryland",
-    "MA": "Massachusetts",
-    "MI": "Michigan",
-    "MN": "Minnesota",
-    "MS": "Mississippi",
-    "MO": "Missouri",
-    "MT": "Montana",
-    "NE": "Nebraska",
-    "NV": "Nevada",
-    "NH": "New Hampshire",
-    "NJ": "New Jersey",
-    "NM": "New Mexico",
-    "NY": "New York",
-    "NC": "North Carolina",
-    "ND": "North Dakota",
-    "MP": "Northern Mariana Islands",
-    "OH": "Ohio",
-    "OK": "Oklahoma",
-    "OR": "Oregon",
-    "PW": "Palau",
-    "PA": "Pennsylvania",
-    "PR": "Puerto Rico",
-    "RI": "Rhode Island",
-    "SC": "South Carolina",
-    "SD": "South Dakota",
-    "TN": "Tennessee",
-    "TX": "Texas",
-    "UT": "Utah",
-    "VT": "Vermont",
-    "VI": "Virgin Islands",
-    "VA": "Virginia",
-    "WA": "Washington",
-    "WV": "West Virginia",
-    "WI": "Wisconsin",
-    "WY": "Wyoming"
-    };
-var activities, autocomplete, locObj, $checkboxes, initCityState
-var loadCnt = 0;
-var stateByName = swap(statesByAbb);
-var componentForm = {
-    street_number: 'short_name',
-    route: 'long_name',
-    locality: 'long_name',
-    administrative_area_level_1: 'short_name',
-    country: 'long_name',
-    postal_code: 'short_name'
-};
-
-//functions
 function swap(json) {
     var ret = {};
     for(var key in json){ret[json[key]] = key};
     return ret;
 }
 function loadActivitiesStandard() {
-    var actForm = $("#activities");
+var actForm = $("#activities");
     $("#activities-list").show();
     actForm.empty();
     for(var i = 0; i < listedActivties.length; i++) {
@@ -450,10 +519,11 @@ function initAutocomplete() {
         });
 }
 function fillFromLatLng(){
+    $("#location-loading").show();
     $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + locObj.lat + "," + locObj.lng).done (
         function(address) {
-            console.log("fillFromLatLng: " + JSON.stringify(locObj))
             console.log(address)
+            $("#location-loading").hide();
             $("#location").val(address.results[0].formatted_address);
             setNavFeaturesWidth();
             // $("#location").attr('size', $("#location").val().length)
@@ -472,8 +542,6 @@ function fillFromPlace(place) {
     };
 
     for (var i = 0; i < place.address_components.length; i++) {
-        var cityComp = false;
-        var stateComp = false;
         var addressType = place.address_components[i].types[0];
         if (componentForm[addressType]) {
             var val = place.address_components[i][componentForm[addressType]];
@@ -496,22 +564,22 @@ function fillFromPlace(place) {
 }
 function establishLocation(source) {
     loadCnt++;
+    $("#location-loading").show();
     if(source === "IP") {
         $.getJSON('https://geoip-db.com/json/').done(
-            function(location) {
+            function(results) {
                 locObj = new Location(
-                        location.latitude,
-                        location.longitude,
-                        location.postal,
-                        location.city,
-                        location.state,
-                        location.city + ", " + stateByName[location.state],
-                        "IP"
-                    )
-                if(loadCnt == 1) {initCityState = locObj.cityState}
-                    console.log(loadCnt + ": " + locObj.cityState)
-                    console.log(locObj)
+                    results.latitude,
+                    results.longitude,
+                    results.postal,
+                    results.city,
+                    results.state,
+                    results.city + ", " + stateByName[results.state],"IP")
+                if(loadCnt == 1) {
+                    initCityState = locObj.cityState;
+                };
                 $("#location").val(locObj.cityState);
+                $("#location-loading").hide();
                 setNavFeaturesWidth();
                 // $("#location").attr('size', $("#location").val().length)
             }
@@ -542,12 +610,13 @@ function establishLocation(source) {
 function setNavFeaturesWidth(){
     var locInputBox = $("#location");
     if($(window).width() <= 800) {
-        console.log('resized-small')
-        locInputBox.attr('size',"30")
+        // locInputBox.attr('size',"30")
+        $("#activities .form-check-label").removeClass("mx-1").addClass("mx-3")
         // locInputBox.removeClass("form-control-inline");
         // locInputBox.addClass("form-control");
     } else {
-        locInputBox.attr('size', "50");
+        // locInputBox.attr('size', "30");
+        $("#activities .form-check-label").removeClass("mx-3").addClass("mx-1")
         // locInputBox.removeClass("form-control");
         // locInputBox.addClass("form-control-inline");
     }
