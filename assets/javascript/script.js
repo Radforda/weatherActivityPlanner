@@ -90,6 +90,7 @@ function mapForecastObject(data) {
     data.list.forEach(element => {
         var day = {
             date: moment(element.dt_txt).format('LLL'),
+            rawMoment:element.dt_txt,
             number:Number(moment(element.dt_txt).format("DD")),
             name: moment(element.dt_txt).format('dddd'),
             time:Number(moment(element.dt_txt).format("HH")),
@@ -133,61 +134,86 @@ getForecast();
 //variables
 var Running = {
     name: "Running",
-    tempMax: 80,
-    tempMin: 55,
+    tempMax: 85,
+    tempMin: 40,
     windMin: 0,
-    windMax: 20,
+    windMax: 25,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-    precip: ['none']
+    
 };
 
 var Cycling = {
     name: "Cycling",
-    tempMax: 110,
-    tempMin: 60,
-    windMin: 10,
+    tempMax: 90,
+    tempMin: 40,
+    windMin: 0,
     windMax: 20,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-    precip: ['none', 'lightRain']
+ 
 };
 
 var Golfing = {
     name: "Golfing",
-    tempMax: 110,
-    tempMin: 60,
-    windMin: 10,
+    tempMax: 95,
+    tempMin: 50,
+    windMin: 0,
     windMax: 20,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-    precip: ['none', 'lightRain']
 };
 
-//days will be populated with weather API data these are test days currently
-var day1 = {
-    name: "Monday",
-    tempMax: 70,
-    tempMin: 65,
-    windMin: 15,
-    windMax: 17,
-    skyCondition: "clear",
-    precip: 'none'
-
+var Camping = {
+    name: "Camping",
+    tempMax: 90,
+    tempMin: 55,
+    windMin: 0,
+    windMax: 25,
+    precip: ['none'],
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
-var day2 = {
-    name: "tuesday",
-    tempMax: 70,
-    tempMin: 60,
+
+
+var Beach= {
+    name: "Beach",
+    tempMax: 120,
+    tempMin: 75,
+    windMin: 0,
+    windMax: 25,
+    precip: ['none'],
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+};
+
+var Sailing= {
+    name: "Sailing",
+    tempMax: 95,
+    tempMin: 55,
     windMin: 10,
     windMax: 20,
-    skyCondition: 'clear',
-    precip: 'none'
+    precip: ['none'],
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
+};
+
+var Snowboarding= {
+    name: "Snowboarding",
+    tempMax: 32,
+    tempMin: -20,
+    windMin: 0,
+    windMax: 15,
+    precip: ['none'],
+    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
 
 
-var listedActivties = [Cycling, Running, Golfing]
+
+
+
+var listedActivties = [Cycling, Running, Golfing, Sailing, Beach, Camping];
 var selectedActivityArray = [];
-var dayArray = [day1, day2];
+
 var displayDay=[];
 var currentDay=Number(moment().format("DD"));
 console.log("currentDay"+currentDay);
@@ -209,15 +235,15 @@ function checkWeather() {
 
     for (var j = 0; j < forecastDays.length; j++) {
         console.log("j: " + j);
-        console.log(forecastDays[j].number+"  "+currentDay+" "+comparisonDay)
-        if (forecastDays[j].number!=currentDay&&forecastDays[j].time<=21&&forecastDays[j].time>=9){
+        console.log("forcast date: "+forecastDays[j].number+" current day:  "+currentDay+" comparison switch day:"+comparisonDay)
+        if ((forecastDays[j].number!=currentDay)&&(forecastDays[j].time<=21)&&(forecastDays[j].time>=9)){
             if (forecastDays[j].number==comparisonDay){
-                if (forecastDays[j]!=currentDay+1){
+                if (forecastDays[j]!=comparisonDay+1){
                     $("#results").append(card);
                 }
 
                 console.log("creating card");
-                comparisonDay++;
+                comparisonDay=Number(moment(forecastDays[j].rawMoment).add(1, 'days').format("DD"))
                 card=$("<div>").addClass("card").html("");
                 cardHeader=$('<h5>').addClass("card-header").text(forecastDays[j].name);
                 cardBody=$("<div>").addClass("card-body").html("");
@@ -261,7 +287,6 @@ function isItAGoodDay(activity, day) {
             } else { };
         } else {};
     } else {  };
-
 };
 
 
@@ -411,6 +436,7 @@ function confirmUpdateAddressModal(){
 }
 
 function ActivityCheckboxUpdate(){
+    
     var showButton = $("#submit-search");
     var actElArr = $checkboxes.filter(':checked')
     $('#actCount').val(actElArr.length);
@@ -424,10 +450,10 @@ function ActivityCheckboxUpdate(){
 }
 
 $(document).ready(function(){
-    $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
-    $(".signIn").on("click", signInProcedure);
-    establishLocation("IP");
     loadActivitiesStandard();
+    $checkboxes = $('#activities input[type="checkbox"]').change(ActivityCheckboxUpdate);
+    $("#signIn").on("click", signInProcedure);
+    establishLocation("IP");
     $("#location").focus(locationUpdate);
     $("#location").focusout(locLoseFocus);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     $("#geolocate").click(loadGeoLocate);
