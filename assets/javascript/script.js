@@ -90,6 +90,7 @@ function mapForecastObject(data) {
     data.list.forEach(element => {
         var day = {
             date: moment(element.dt_txt).format('LLL'),
+            rawMoment:element.dt_txt,
             number:Number(moment(element.dt_txt).format("DD")),
             name: moment(element.dt_txt).format('dddd'),
             time:Number(moment(element.dt_txt).format("HH")),
@@ -137,6 +138,7 @@ var Running = {
     tempMin: 40,
     windMin: 0,
     windMax: 25,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
     
 };
@@ -145,8 +147,9 @@ var Cycling = {
     name: "Cycling",
     tempMax: 90,
     tempMin: 40,
-    windMin: 10,
+    windMin: 0,
     windMax: 20,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
  
 };
@@ -157,6 +160,7 @@ var Golfing = {
     tempMin: 50,
     windMin: 0,
     windMax: 20,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
@@ -166,17 +170,11 @@ var Camping = {
     tempMin: 55,
     windMin: 0,
     windMax: 25,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
-var BeachCamping = {
-    name: "Beach Camping",
-    tempMax: 100,
-    tempMin: 80,
-    windMin: 0,
-    windMax: 15,
-    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-};
+
 
 var Beach= {
     name: "Beach",
@@ -184,6 +182,7 @@ var Beach= {
     tempMin: 75,
     windMin: 0,
     windMax: 25,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
@@ -193,6 +192,7 @@ var Sailing= {
     tempMin: 55,
     windMin: 10,
     windMax: 20,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
@@ -202,30 +202,16 @@ var Snowboarding= {
     tempMin: -20,
     windMin: 0,
     windMax: 15,
-    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-};
-
-var HangGliding= {
-    name: "Hang Gliding",
-    tempMax: 95,
-    tempMin: 55,
-    windMin: 15,
-    windMax: 30,
-    skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
-};
-
-var KiteFlying= {
-    name: "Kite Flying",
-    tempMax: 95,
-    tempMin: 55,
-    windMin: 10,
-    windMax: 25,
+    precip: ['none'],
     skyCondition: ['clear', 'cloudy'],//will need updated depending on the API
 };
 
 
 
-var listedActivties = [Cycling, Running, Golfing, Sailing, Beach, BeachCamping, Camping, HangGliding, KiteFlying];
+
+
+
+var listedActivties = [Cycling, Running, Golfing, Sailing, Beach, Camping];
 var selectedActivityArray = [];
 
 var displayDay=[];
@@ -249,15 +235,15 @@ function checkWeather() {
 
     for (var j = 0; j < forecastDays.length; j++) {
         console.log("j: " + j);
-        console.log(forecastDays[j].number+"  "+currentDay+" "+comparisonDay)
-        if (forecastDays[j].number!=currentDay&&forecastDays[j].time<=21&&forecastDays[j].time>=9){
+        console.log("forcast date: "+forecastDays[j].number+" current day:  "+currentDay+" comparison switch day:"+comparisonDay)
+        if ((forecastDays[j].number!=currentDay)&&(forecastDays[j].time<=21)&&(forecastDays[j].time>=9)){
             if (forecastDays[j].number==comparisonDay){
-                if (forecastDays[j]!=currentDay+1){
+                if (forecastDays[j]!=comparisonDay+1){
                     $("#results").append(card);
                 }
 
                 console.log("creating card");
-                comparisonDay++;
+                comparisonDay=Number(moment(forecastDays[j].rawMoment).add(1, 'days').format("DD"))
                 card=$("<div>").addClass("card").html("");
                 cardHeader=$('<h5>').addClass("card-header").text(forecastDays[j].name);
                 cardBody=$("<div>").addClass("card-body").html("");
